@@ -125,17 +125,16 @@ MACHINEFILE_INTEL=$MACHINE_FILE/nodes_intel
 PROJECT=$MACHINE_FILE/experimental_project.csv
 
 for (( i = 0; i < 30; i++ )); do
-	echo $appsa >> $MACHINE_FILE/experimental_project.csv
-	echo $appsi >> $MACHINE_FILE/experimental_project.csv
+	echo $appsa >> /tmp/expd
+	echo $appsi >> /tmp/expd
 	for (( n = 0; n < 8; n++ )); do
-		echo ${appsn[n]} >> $MACHINE_FILE/experimental_project.csv
+		echo ${appsn[n]} >> /tmp/expd
 	done
 done
 
-shuf $MACHINE_FILE/experimental_project.csv -o $MACHINE_FILE/experimental_project.csv
-
-
-cat -n $MACHINE_FILE/experimental_project.csv | sed -e 's/\s\+/,/g' | sed 's/^,//' >> $MACHINE_FILE/experimental_project.csv
+shuf /tmp/expd -o $MACHINE_FILE/experimental_project.csv
+awk '{print NR "," $0} END{print ""}' /tmp/exp > $MACHINE_FILE/experimental_project.csv
+rm /tmp/expd /tmp/exp 
 #############################################################################################################
 #######################Step 5: Read the Experimental Project and Started the Execution Loop##################
 #############################################################################################################
