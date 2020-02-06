@@ -6,10 +6,10 @@
 #+EXPORT_EXCLUDE_TAGS: noexport
 #+SEQ_TODO: TODO(t!) STARTED(s!) WAITING(w!) | DONE(d!) CANCELLED(c!) DEFERRED(f!)
 
-This LabBook is for the *CMP223 - Computer System Performance* *Analysis
-(2019/2)* final work and has a wealth of informations about the entire
-process used during the proposed experiments. To reproduce this
-evaluation, you can follow the steps below. Have fun!
+This LabBook is for the *25th IEEE Symposium on Computers and
+Communications (ISCC) 2020* paper and has a wealth of informations
+about the entire process used during the proposed experiments. To
+reproduce this evaluation, you can follow the steps below. Have fun!
 
 #+BEGIN_QUOTE
 *Reporting errors*: This repository has several links to self-contained
@@ -21,24 +21,18 @@ evaluation, you can follow the steps below. Have fun!
 * Experimental Project
 ** Objective
    Assess the impact of the network interconnection on HPC
-   applications. Both *InfiniBand (IB)* and *Gigabit Ethernet (ETH)*, as
-   well as *IP-over-IB (IPoIB)* interconnections were evaluated using
-   the same physical cluster of servers. The MPI-PingPong benchmark of
-   the [[https://software.intel.com/en-us/articles/intel-mpi-benchmarks][Intel MPI Benchmarks]] suite was executed to first characterize
-   the interconnection latency and throughput. Then two synthetic
-   benchmarks (NPB and ImbBench) and one real application (Alya) were
-   executed. [[https://www.nas.nasa.gov/publications/npb.html][NAS Parallel Benchmarks (NPB)]] set version 3.4 with input
-   *class D* was used because it represent several patterns of real HPC
-   applications, as well as being characterized as a balanced
-   benchmarks set (when an MPI parallel application distributes work
-   between processes evenly, and therefore all end almost together,
-   making the best use of available resources). On the other hand,
-   [[https://github.com/Roloff/ImbBench.git][Inbalanced Benchmark (IMB)]] was created to represent the more common
-   inbalanced application patterns. Thus, with both of the mentioned
-   benchmarks we cover the common HPC application and also the
-   balanced and inbalanced patterns. [[https://www.bsc.es/research-development/research-areas/engineering-simulations/alya-high-performance-computational][Alya]] was used because this work
-   tends to cover not only synthetic benchmarks which try to mimic
-   real applications but rather use a real application.
+   applications regarding performance and cost effiency. Two different
+   instances (A8 and A10) from Microsoft Azure with same physical
+   hardware, but different interconnections (InfiniBand (IB) and 10
+   GbE were evaluated. The MPI-PingPong benchmark of the [[https://software.intel.com/en-us/articles/intel-mpi-benchmarks][Intel MPI
+   Benchmarks]] suite was executed to first characterize the
+   interconnection latency and throughput. Then we executed the NPB
+   set of synthetic benchmarks and one real application (Alya). [[https://www.nas.nasa.gov/publications/npb.html][NAS
+   Parallel Benchmarks (NPB)]] set version 3.4 with input *class D* was
+   used because it represent several patterns of real HPC
+   applications. [[https://www.bsc.es/research-development/research-areas/engineering-simulations/alya-high-performance-computational][Alya]] was used because this work tends to cover not
+   only synthetic benchmarks which try to mimic real applications but
+   rather use a real application.
 
 ** Benchmarks
 Below is a brief overview about the benchmarks used.
@@ -83,8 +77,7 @@ node, in the case of IS, EP, CG, FT, MG, and LU (power-of-two). Since
 BT and SP require that the number of processes to be a square root,
 144 processes were used, with 36 processes in each node.
 
-*** Inbalanced Benchmark
-Imbalance Benchmark (ImbBench) is a set of MPI-based applications,
+ ce Benchmark (ImbBench) is a set of MPI-based applications,
 created by the Ph.D. Student Eduardo Roloff, that simulate several
 behaviors in terms of process loads. ImbBench was designed with the
 cloud heterogeneity in mind, and its goal is to help the user to
@@ -114,9 +107,14 @@ the *$HOME* of the desired cluster of servers.
 cd $HOME; git clone https://github.com/andermm/CMP223
 #+end_src
 
-Here it is assumed that your HOME directory is exported with NFS. If
-you don't have the NFS configured, [[https://www.digitalocean.com/community/tutorials/how-to-set-up-an-nfs-mount-on-ubuntu-16-04][here]] is a tutorial to do it. If
-this step is ok, go ahead to the other topics.
+Then executes the [[SH/clean_folders_files.sh][clean bash script]] to clean the results and all
+obtained data from this evaluation.
+
+#+begin_src shell :results output :exports both
+cd $HOME/ISCC-2020/SH; ./clean_folders_files.sh 
+#+end_src
+
+then...
 
 ** Required Softwares
 To execute the experiments, some required packages need to
@@ -6967,4 +6965,4 @@ ggsave("PAPER/img/FT-EP-Alya-IMB-paper.pdf")
 
 #+RESULTS:
 [[file:R/PLOTS/FT-EP-Alya-IMB.png]]
-[[file:R/PLOTS/FT-EP-Alya-IMB.png]
+[[file:R/PLOTS/FT-EP-Alya-IMB.png
