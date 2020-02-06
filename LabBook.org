@@ -123,8 +123,6 @@ be installed. They are:
 - libopenmpi-dev - High performance message passing library (mpicc and
   mpifort).
 - gfortran - GNU Fortran 95 compiler.
-- cmake - Cross-platform, open-source make system.
-- pajeng - Space-time view and associated tools for Paje trace files.
 
 If your OS is Debian based and you have permission to install new
 packages, you can install the required packages using the [[SH/software_install.sh][Software
@@ -135,86 +133,10 @@ to use Spack can be seen [[https://spack-tutorial.readthedocs.io/en/latest/][her
 ** System Information 
    To collect the information of all nodes used in the evaluation, it
    was used the [[SH/sys_info_collect.sh][System Information Collect]] script, which creates the
-   [[LOGS/env_info.org][System Information]] log output with ORG extension. The script
+   a [[LOGS/env_info.org][System Information]] log output with ORG extension. The script
    executes automatically in the execution script.
 
 ** Network Infrastructure Information
-Each node has a Mellanox MT27600 Channel Adapter (CA) configured for
-the InfiniBand 56 Gb/s 4X FDR ConnectX-3 with firmware version
-10.16.1038 and OFED version 4.6-1.0.1.1. All nodes are interconnected
-through a Mellanox SX6036 FDR and a generic de 1 Gbps switch.
-
-** Design of Experiments
-   To execute benchmarks without bias, the DoE.base library was used
-   to create Experiment Design (DoE). In DoE, two factors were used,
-   applications and interface, with 30 random replications, totaling
-   1080 (12 * 3 * 30) distinct executions. For the characterization of
-   the applications, one random replication was performed totaling 33
-   (11 * 3) distinct executions (the MPI PingPong benchmark was not
-   performed in the characterization step).
-
-Execution factors:
-- Factor 1 - Apps: The applications name totaling 12 (~exec_bt~,
-  ~exec_ep~, ~exec_cg~, ~exec_mg~, ~exec_lu~, ~exec_sp~, ~exec_is~, ~exec_ft~,
-  ~exec_imb_memory~, ~exec_imb_CPU~, ~exec_intel~, and ~exec_alya~).
-- Factor 2 - Interface: The network interface names, totaling 3 (~eth~,
-  ~ib~, ~ipoib~).
-
-Characterization factors:
-- Factor 1 - Apps: The applications name totaling 11 (~charac_bt~,
-  ~charac_ep~, ~charac_cg~, ~charac_mg~, ~charac_lu~, ~charac_sp~, ~charac_is~,
-  ~charac_ft~, ~charac_imb_memory~, ~charac_imb_CPU~, and ~charac_alya~).
-- Factor 2 - Interface: The network interface names, totaling 3 (~eth~,
-  ~ib~, ~ipoib~).
-
-Below is the R code block which generates the CSV files.
-#+begin_src R :results output :session *R* :exports both
-options(crayon.enabled=FALSE)
-library(DoE.base)
-library(tidyverse)
-
-set.seed(0)
-  cmp223_exec <- fac.design(factor.names = list(
-    apps = c("exec_bt", "exec_ep", "exec_cg", "exec_mg", "exec_lu",
-             "exec_sp", "exec_is", "exec_ft", "exec_imb_memory",
-             "exec_imb_CPU", "exec_intel", "exec_alya"),
-    interface = c("eth", "ib", "ipoib")),
-    replications=30,
-    randomize=TRUE)
-
-cmp223_exec %>%
-  select(-Blocks) %>%
-  mutate(number=1:n()) -> cmp223_exec
-write_csv(cmp223_exec, "R/experimental_project_exec.csv")
-#+end_src
-
-#+RESULTS:
-: 
-: creating full factorial with 36 runs ...
-
-#+begin_src R :results output :session *R* :exports both
-options(crayon.enabled=FALSE)
-library(DoE.base)
-library(tidyverse)
-
-set.seed(0)
-  cmp223_charac <- fac.design(factor.names = list(
-    apps = c("charac_bt", "charac_ep", "charac_cg", "charac_mg", "charac_lu",
-             "charac_sp", "charac_is", "charac_ft", "charac_imb_memory",
-             "charac_imb_CPU", "charac_alya"),
-    interface = c("eth", "ib", "ipoib")),
-    replications=1,
-    randomize=TRUE)
-
-cmp223_charac %>%
-  mutate(number=1:n()) -> cmp223_charac
-write_csv(cmp223_charac, "R/experimental_project_charac.csv")
-#+end_src
-
-#+RESULTS:
-: 
-: creating full factorial with 33 runs ...
-
 ** Bash Scripts Descriptions
 - [[SH/experiments_exec.sh][Experiments Execution]] - This is the most essential script for this
   evaluation. It comprises from the beginning, when the variables are
