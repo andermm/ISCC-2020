@@ -77,19 +77,6 @@ node, in the case of IS, EP, CG, FT, MG, and LU (power-of-two). Since
 BT and SP require that the number of processes to be a square root,
 144 processes were used, with 36 processes in each node.
 
- ce Benchmark (ImbBench) is a set of MPI-based applications,
-created by the Ph.D. Student Eduardo Roloff, that simulate several
-behaviors in terms of process loads. ImbBench was designed with the
-cloud heterogeneity in mind, and its goal is to help the user to
-choose the most suitable configuration to execute an application in
-the cloud. ImbBench distributes the load among all the available
-processes according to a preselected imbalanced pattern.
-
-ImbBench has a set of microbenchmarks and parameters to benchmark CPU
-and Memory. In this evaluation, it was used both CPU and Memory
-benchmarks with the 8Level pattern of imbalance and the Rand and BST
-microbenchmarks, respectively.
-
 *** Alya
 Alya is a high performance computational mechanics code to solve
 complex coupled multi-physics / multi-scale / multi-domain problems,
