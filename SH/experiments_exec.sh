@@ -5,7 +5,7 @@
 #############################################################################################################
 
 #Variable Directories
-BASE=$HOME/ISCC
+BASE=$HOME/iscc
 SCRIPTS=$BASE/SH
 BENCHMARKS=$BASE/BENCHMARKS
 LOGS=$BASE/LOGS
@@ -38,7 +38,7 @@ START=`date +"%d-%m-%Y.%Hh%Mm%Ss"`
 OUTPUT_APPS_EXEC=$LOGS/exec.$START.csv
 OUTPUT_INTEL_EXEC=$LOGS/intel.$START.csv
 CONTROL_FILE_OUTPUT=$BASE/LOGS/env_info.org
-PARTITION=(ISCC01 ISCC02 ISCC03 ISCC03 ISCC04 ISCC05 ISCC06 ISCC07 ISCC08)
+PARTITION=(ISCC1 ISCC2 ISCC3 ISCC4 ISCC5 ISCC6 ISCC7 ISCC8)
 
 #############################################################################################################
 #######################Step 2: Create the Folders/Download and Compile the Programs##########################
@@ -63,7 +63,7 @@ echo "" >> $CONTROL_FILE_OUTPUT
 
 #Executes the system information collector script
 for (( i = 0; i < 8; i++ )); do
-	ssh ${PARTITION[i]} '/home/ISCC/ISCC-2020/SH/./sys_info_collect.sh'
+	ssh ${PARTITION[i]} '/home/iscc/ISCC-2020/SH/./sys_info_collect.sh'
 done
 
 
