@@ -1,4 +1,4 @@
-#+TITLE: CMP223
+#+TITLE: 25th IEEE Symposium on Computers and Communications (ISCC) 2020
 #+AUTHOR: Anderson M. Maliszewski
 #+STARTUP: overview indent
 #+TAGS: noexport(n) deprecated(d)
