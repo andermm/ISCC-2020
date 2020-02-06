@@ -142,11 +142,11 @@ cat -n $MACHINE_FILE/experimental_project.csv | sed -e 's/\s\+/,/g' | sed 's/^,/
 
 #Read the experimental project
 tail -n +2 $PROJECT |
-while IFS=, read -r apps interface number
+while IFS=, read -r number apps
 do
 
 #Define a single key
-	KEY="$number-$apps-$interface"
+	KEY="$number-$apps"
 	echo ""
 	echo $KEY
 	echo ""
@@ -165,19 +165,12 @@ do
 	fi
 
 #Select app
-##Alya, IMB
-	if [[ $apps == exec_alya || $apps == exec_imb_memory || $apps == exec_imb_CPU ]]; then
-		PROCS=160
-		runline+="-np $PROCS -machinefile $MACHINEFILE_FULL "
-	elif [[ $apps == exec_intel ]]; then
+	if [[ $apps == exec_intel ]]; then
 		PROCS=2
 		runline+="-np $PROCS -machinefile $MACHINEFILE_INTEL "
-	elif [[ $apps == exec_bt || $apps == exec_sp ]]; then
-		PROCS=144							
-		runline+="-np $PROCS -machinefile $MACHINEFILE_SQUARE_ROOT "
 	else
-		PROCS=128
-		runline+="-np $PROCS -machinefile $MACHINEFILE_POWER_OF_2 "
+		PROCS=64
+		runline+="-np $PROCS -machinefile $MACHINEFILE "
 	fi
 
 #Save the output according to the app
@@ -186,23 +179,13 @@ do
 		runline+="2>> $LOGS/apps_exec_std_error "
 		runline+="&> >(tee -a $LOGS/LOGS_BACKUP/$apps.$interface.log > /tmp/intel_mb.out)"
 
-	elif [[ $apps == exec_imb_memory ]]; then
-		runline+="$BENCHMARKS/$APP_BIN_IMBE $IMB_MEMORY $IMB_MEMORY_PATTERN $IMB_MEMORY_MICROBENCHMARK "
-		runline+="2>> $LOGS/apps_exec_std_error "
-		runline+="&> >(tee -a $LOGS/LOGS_BACKUP/$apps.$interface.log > /tmp/imb.out)"
-
-	elif [[ $apps == exec_imb_CPU ]]; then
-		runline+="$BENCHMARKS/$APP_BIN_IMBE $IMB_CPU $IMB_CPU_PATTERN $IMB_CPU_MICROBENCHMARK "
-		runline+="2>> $LOGS/apps_exec_std_error "
-		runline+="&> >(tee -a $LOGS/LOGS_BACKUP/$apps.$interface.log > /tmp/imb.out)"
-
 	elif [[ $apps == exec_alya ]]; then
 		runline+="$BENCHMARKS/$APP_BIN_ALYAE BENCHMARKS/$APP_ALYAE_TUFAN "
 		runline+="2 >> $LOGS/apps_exec_std_error "
 		runline+="&> >(tee -a $LOGS/LOGS_BACKUP/$apps.$interface.log > /tmp/alya.out)"
 	
 	else
-		runline+="$BENCHMARKS/$APP_BIN_NPBE/${apps:5:7}.D.x "
+		runline+="$BENCHMARKS/$APP_BIN_NPBE/${apps:5:7}.C.x "
 		runline+="2>> $LOGS/apps_exec_std_error "
 		runline+="&> >(tee -a $LOGS/LOGS_BACKUP/$apps.$interface.log > /tmp/nas.out)"	
 	fi	
