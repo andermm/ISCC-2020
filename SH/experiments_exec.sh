@@ -177,17 +177,17 @@ do
 	if [[ $apps == exec_intel ]]; then
 		runline+="$BENCHMARKS/$APP_BIN_INTEL $APP_TEST_INTEL "
 		runline+="2>> $LOGS/apps_exec_std_error "
-		runline+="&> >(tee -a $LOGS/LOGS_BACKUP/$apps.$interface.log > /tmp/intel_mb.out)"
+		runline+="&> >(tee -a $LOGS/LOGS_BACKUP/$apps.log > /tmp/intel_mb.out)"
 
 	elif [[ $apps == exec_alya ]]; then
 		runline+="$BENCHMARKS/$APP_BIN_ALYAE BENCHMARKS/$APP_ALYAE_TUFAN "
 		runline+="2 >> $LOGS/apps_exec_std_error "
-		runline+="&> >(tee -a $LOGS/LOGS_BACKUP/$apps.$interface.log > /tmp/alya.out)"
+		runline+="&> >(tee -a $LOGS/LOGS_BACKUP/$apps.log > /tmp/alya.out)"
 	
 	else
 		runline+="$BENCHMARKS/$APP_BIN_NPBE/${apps:5:7}.C.x "
 		runline+="2>> $LOGS/apps_exec_std_error "
-		runline+="&> >(tee -a $LOGS/LOGS_BACKUP/$apps.$interface.log > /tmp/nas.out)"	
+		runline+="&> >(tee -a $LOGS/LOGS_BACKUP/$apps.log > /tmp/nas.out)"	
 	fi	
 
 #Execute the experiments
@@ -198,7 +198,7 @@ do
 	if [[ $apps == exec_intel ]]; then
 		N=`tail -n +35 /tmp/intel_mb.out | awk {'print $1'} | grep -v '[^ 0.0-9.0]' | sed '/^[[:space:]]*$/d' | wc -l`
 		for (( i = 0; i < $N; i++ )); do
-			echo "$apps,$interface" >> /tmp/for.out
+			echo "$apps" >> /tmp/for.out
 		done
 
 		tail -n +35 /tmp/intel_mb.out | awk {'print $1'} | grep -v '[^ 0.0-9.0]' | sed '/^[[:space:]]*$/d' > /tmp/BYTES
@@ -209,16 +209,16 @@ do
 		
 	elif [[ $apps == exec_alya ]]; then
 		TIME=`cat $BENCHMARKS/$ALYAE_LOG | grep "TOTAL CPU TIME" | awk '{print $4}'`
-		echo "$apps,$interface,$TIME" >> $OUTPUT_APPS_EXEC
+		echo "$apps,$TIME" >> $OUTPUT_APPS_EXEC
 	
 	else
 		TIME=`grep -i "Time in seconds" /tmp/nas.out | awk {'print $5'}`
-		echo "$apps,$interface,$TIME" >> $OUTPUT_APPS_EXEC
+		echo "$apps,$TIME" >> $OUTPUT_APPS_EXEC
 	fi
 
 	echo "Done!"
 done
-sed -i '1s/^/apps,interface,time\n/' $OUTPUT_APPS_EXEC
-sed -i '1s/^/apps,interface,bytes,time,mbytes-sec\n/' $OUTPUT_INTEL_EXEC
+sed -i '1s/^/apps,time\n/' $OUTPUT_APPS_EXEC
+sed -i '1s/^/apps,bytes,time,mbytes-sec\n/' $OUTPUT_INTEL_EXEC
 
 exit
