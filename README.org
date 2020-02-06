@@ -53,10 +53,9 @@ generate the graphics.
   Techniques for Experimental Design, Measurement, Simulation, and
   Modeling]], Wiley-Interscience, New York, NY, April 1991.
 #+BEGIN_QUOTE
-This was the base book used in the *CMP223 - Computer System
-Performance Analysis (2019/2)* discipline and can be considered the
-oracle for creating performance evaluations even though it is old, but
-the checklists and concepts are still current today.
+This is a self-content book considered an oracle for creating
+practical performance evaluations, even though it is old, but the
+checklists and concepts are still current today.
 #+END_QUOTE
 + Legrand. Arnaud, Schnorr. Lucas, [[https://github.com/alegrand/SMPE.git][Scientific Methodology and
   Performance Evaluation for Computer Scientists]], GitHub Repository.
