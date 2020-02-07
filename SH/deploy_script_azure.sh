@@ -13,5 +13,19 @@ az vm create \
     --location westus \
     --image UbuntuLTS \
     --verbose \
-    --ssh-key-value chave.pub
+    --ssh-key-value chave.pub \
+    --generate-ssh-keys
+done
+
+#Create 8 virtual machines from A10 template.
+for i in `seq 1 8`; do
+az vm create \
+    --admin-username iscc \
+    --resource-group ISCC-2020 \
+    --name try10 \
+    --size Standard_A10 \
+    --location westus \
+    --image UbuntuLTS \
+    --verbose \
+    --generate-ssh-keys
 done
