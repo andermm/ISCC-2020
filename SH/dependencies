@@ -1,2 +1,0 @@
-sudo apt update -y && sudo apt upgrade -y
-sudo apt install make gfortran openmpi-bin libopenmpi-dev libdapl2 libmlx4-1 -y
