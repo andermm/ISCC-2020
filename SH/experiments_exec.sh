@@ -5,7 +5,7 @@
 #############################################################################################################
 
 #Variable Directories
-BASE=$HOME/iscc
+BASE=$HOME/iscc/ISCC-2020
 SCRIPTS=$BASE/SH
 BENCHMARKS=$BASE/BENCHMARKS
 LOGS=$BASE/LOGS
