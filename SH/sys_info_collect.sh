@@ -1,8 +1,12 @@
 BASE=$HOME/ISCC-2020
 
-mkdir -p $BASE/LOGS/SYS_INFO
 
-CONTROL_FILE_OUTPUT=$BASE/LOGS/SYS_INFO/env_info.org
+if [[ $(eval hostname) == A10ISCC1 ]]; then
+	CONTROL_FILE_OUTPUT=$BASE/LOGS/SYS_INFO/env_info_A10.org
+else
+	CONTROL_FILE_OUTPUT=$BASE/LOGS/SYS_INFO/env_info_A8.org
+fi
+
 
 lstopo $BASE/LOGS/SYS_INFO/$hostname.pdf
 

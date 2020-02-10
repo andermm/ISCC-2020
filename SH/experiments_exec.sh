@@ -38,19 +38,19 @@ START=`date +"%d-%m-%Y.%Hh%Mm%Ss"`
 if [[ $(eval hostname) == A10ISCC1 ]]; then
 	OUTPUT_APPS_EXEC=$LOGS/exec_A10.$START.csv
 	OUTPUT_INTEL_EXEC=$LOGS/intel_A10.$START.csv
-	CONTROL_FILE_OUTPUT=$BASE/LOGS/env_info_A10.org
+	CONTROL_FILE_OUTPUT=$BASE/LOGS/SYS_INFO/env_info_A10.org
 	PARTITION=(A10ISCC1 A10ISCC2 A10ISCC3 A10ISCC4 A10ISCC5 A10ISCC6 A10ISCC7 A10ISCC8)
 else
 	OUTPUT_APPS_EXEC=$LOGS/exec_A8.$START.csv
 	OUTPUT_INTEL_EXEC=$LOGS/intel_A8.$START.csv
-	CONTROL_FILE_OUTPUT=$BASE/LOGS/env_info_A8.org
+	CONTROL_FILE_OUTPUT=$BASE/LOGS/SYS_INFO/env_info_A8.org
 	PARTITION=(A8ISCC1 A8ISCC2 A8ISCC3 A8ISCC4 A8ISCC5 A8ISCC6 A8ISCC7 A8ISCC8)
 fi
 
 #############################################################################################################
 #######################Step 2: Create the Folders/Download and Compile the Programs##########################
 #############################################################################################################
-
+mkdir -p $BASE/LOGS/SYS_INFO
 mkdir -p $BENCHMARKS
 mkdir -p $LOGS
 mkdir -p $BASE/LOGS/LOGS_BACKUP
