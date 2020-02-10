@@ -23,7 +23,7 @@ az vm create \
     --admin-username iscc \
     --resource-group ISCC-2020 \
     --generate-ssh-keys \
-    --name ISCC$i \
+    --name A10_ISCC$i \
     --size Standard_A10 \
     --location westus \
     --image UbuntuLTS \
@@ -31,7 +31,7 @@ az vm create \
 
 az vm run-command invoke \
 	-g ISCC-2020 \
-	-n ISCC \
+	-n A10_ISCC$i \
 	--command-id RunShellScript \
 	--scripts "sudo apt update -y && 
 	sudo apt upgrade -y && 

@@ -35,10 +35,17 @@ APP_TEST_INTEL=PingPong
 
 #Other Variables
 START=`date +"%d-%m-%Y.%Hh%Mm%Ss"`
-OUTPUT_APPS_EXEC=$LOGS/exec.$START.csv
-OUTPUT_INTEL_EXEC=$LOGS/intel.$START.csv
-CONTROL_FILE_OUTPUT=$BASE/LOGS/env_info.org
-PARTITION=(ISCC1 ISCC2 ISCC3 ISCC4 ISCC5 ISCC6 ISCC7 ISCC8)
+if [[ $(eval hostaname) == A10_ISCC1 ]]; then
+	OUTPUT_APPS_EXEC=$LOGS/exec_A10.$START.csv
+	OUTPUT_INTEL_EXEC=$LOGS/intel_A10.$START.csv
+	CONTROL_FILE_OUTPUT=$BASE/LOGS/env_info_A10.org
+	PARTITION=(A10_ISCC1 A10_ISCC2 A10_ISCC3 A10_ISCC4 A10_ISCC5 A10_ISCC6 A10_ISCC7 A10_ISCC8)
+else
+	OUTPUT_APPS_EXEC=$LOGS/exec_A8.$START.csv
+	OUTPUT_INTEL_EXEC=$LOGS/intel_A8.$START.csv
+	CONTROL_FILE_OUTPUT=$BASE/LOGS/env_info_A8.org
+	PARTITION=(A8_ISCC1 A8_ISCC2 A8_ISCC3 A8_ISCC4 A8_ISCC5 A8_ISCC6 A8_ISCC7 A8_ISCC8)
+fi
 
 #############################################################################################################
 #######################Step 2: Create the Folders/Download and Compile the Programs##########################
@@ -154,12 +161,10 @@ do
 	runline+="mpiexec --mca btl self,"
 	
 #Select interface
-	if [[ $interface == ib ]]; then
-		runline+="openib --mca btl_openib_if_include mlx5_0:1 "	
-	elif [[ $interface == ipoib ]]; then
-		runline+="tcp --mca btl_tcp_if_include ib0 "
+	if [[ $(eval hostaname) == A10_ISCC1 ]]; then
+		runline+="tcp --mca btl_tcp_if_include eth0 "
 	else
-		runline+="tcp --mca btl_tcp_if_include eno2 "
+		runline+="openib --mca btl_openib_if_include mlx5_0:1 "	
 	fi
 
 #Select app
