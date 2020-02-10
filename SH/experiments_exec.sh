@@ -73,14 +73,14 @@ for (( i = 0; i < 8; i++ )); do
 	ssh ${PARTITION[i]} '/home/iscc/ISCC-2020/SH/./sys_info_collect.sh'
 done
 
-
+`
 ########################################Alya################################################
 #Exec
 cd $BENCHMARKS
 appsa=alya
 git clone --recursive --progress https://gitlab.com/ammaliszewski/alya.git 2> $LOGS_DOWNLOAD/Alya.download.log
 cp -r Alya $LOGS_BACKUP_SRC_CODE
-mv alya Alya_Exec; cp -r Alya_Exec Alya_Charac
+mv alya Alya_Exec
 cd $ALYAE_DIR
 cp configure.in/config_gfortran.in config.in
 sed -i 's,mpif90,mpifort,g' config.in
