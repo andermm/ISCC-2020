@@ -22,7 +22,7 @@ az vm create \
     --admin-username iscc \
     --resource-group ISCC-2020 \
     --generate-ssh-keys \
-    --name A10_ISCC1 \
+    --name A10ISCC1 \
     --size Standard_A10 \
     --location westus \
     --image UbuntuLTS \
