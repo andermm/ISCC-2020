@@ -57,7 +57,7 @@ az vm create \
 
 az vm run-command invoke \
 	-g ISCC-2020 \
-	-n A10_ISCC$i \
+	-n A10ISCC$i \
 	--command-id RunShellScript \
 	--scripts "sudo apt update -y && 
 	sudo apt upgrade -y && 
