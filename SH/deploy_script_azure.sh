@@ -35,7 +35,7 @@ az vm run-command invoke \
 	--scripts "sudo apt update -y && 
 	sudo apt upgrade -y && 
 	sudo apt autoremove -y && 
-	sudo apt install make gfortran openmpi-bin libopenmpi-dev hwloc nfs-kernel-server -y &&
+	sudo apt install make gfortran openmpi-bin libopenmpi-dev hwloc nfs-kernel-server g++ -y &&
 	cd $HOME; git clone --recursive --progress https://github.com/andermm/ISCC-2020.git; 
 	chown -R iscc:iscc ISCC-2020; mv ISCC-2020 /home/iscc;
 	echo '/home/iscc/ISCC-2020 (rw,sync,no_root_squash,no_subtree_check)' >> /etc/exports;
@@ -62,7 +62,7 @@ az vm run-command invoke \
 	--scripts "sudo apt update -y && 
 	sudo apt upgrade -y && 
 	sudo apt autoremove -y && 
-	sudo apt install make gfortran openmpi-bin libopenmpi-dev hwloc nfs-common -y &&
+	sudo apt install make gfortran openmpi-bin libopenmpi-dev hwloc nfs-common g++ -y &&
 	sudo mount -t nfs A10ISCC1:/home/iscc /home/iscc;
 	echo 'A10ISCC1:/home/iscc /home/iscc' >> /etc/fstab"
 done
