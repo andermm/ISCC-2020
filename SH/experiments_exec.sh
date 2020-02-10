@@ -138,7 +138,7 @@ for (( i = 0; i < 30; i++ )); do
 	done
 done
 
-shuf /tmp/expd -o $MACHINE_FILE/experimental_project.csv
+shuf /tmp/expd -o /tmp/exp
 awk '{print NR "," $0} END{print ""}' /tmp/exp > $MACHINE_FILE/experimental_project.csv
 rm /tmp/expd /tmp/exp 
 #############################################################################################################
@@ -146,7 +146,6 @@ rm /tmp/expd /tmp/exp
 #############################################################################################################
 
 #Read the experimental project
-tail -n +2 $PROJECT |
 while IFS=, read -r number apps
 do
 
