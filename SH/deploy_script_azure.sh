@@ -1,21 +1,21 @@
 #!/bin/bash
 
 # Create a resource group.
-#az group create --name ISCC-2020 --location westus
+az group create --name ISCC-2020 --location westus
 
 #Create 8 virtual machines from A8 template.
-#for i in `seq 1 8`; do
-#az vm create \
-#    --admin-username iscc \
-#    --resource-group ISCC-2020 \
-#    --name try3 \
-#    --size Standard_A8 \
-#    --location westus \
-#    --image UbuntuLTS \
-#    --verbose \
-#    --ssh-key-value chave.pub \
-#    --generate-ssh-keys
-#done
+for i in `seq 1 8`; do
+az vm create \
+    --admin-username iscc \
+    --resource-group ISCC-2020 \
+    --name try3 \
+    --size Standard_A8 \
+    --location westus \
+    --image UbuntuLTS \
+    --verbose \
+    --ssh-key-value chave.pub \
+    --generate-ssh-keys
+done
 
 #Create the master virtual machine from A10 template.
 az vm create \
@@ -63,6 +63,6 @@ az vm run-command invoke \
 	sudo apt upgrade -y && 
 	sudo apt autoremove -y && 
 	sudo apt install make gfortran openmpi-bin libopenmpi-dev hwloc nfs-common -y &&
-	sudo mount -t nfs A10ISCC1:/home/iscc/ISCC-2020 /home/iscc;
-	echo 'A10ISCC1:/home/iscc/ISCC-2020 /home/iscc' >> /etc/fstab"
+	sudo mount -t nfs A10ISCC1:/home/iscc /home/iscc;
+	echo 'A10ISCC1:/home/iscc /home/iscc' >> /etc/fstab"
 done

@@ -35,7 +35,7 @@ APP_TEST_INTEL=PingPong
 
 #Other Variables
 START=`date +"%d-%m-%Y.%Hh%Mm%Ss"`
-if [[ $(eval hostaname) == A10ISCC1 ]]; then
+if [[ $(eval hostname) == A10ISCC1 ]]; then
 	OUTPUT_APPS_EXEC=$LOGS/exec_A10.$START.csv
 	OUTPUT_INTEL_EXEC=$LOGS/intel_A10.$START.csv
 	CONTROL_FILE_OUTPUT=$BASE/LOGS/env_info_A10.org
