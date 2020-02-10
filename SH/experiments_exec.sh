@@ -73,7 +73,7 @@ for (( i = 0; i < 8; i++ )); do
 	ssh ${PARTITION[i]} '/home/iscc/ISCC-2020/SH/./sys_info_collect.sh'
 done
 
-`
+
 ########################################Alya################################################
 #Exec
 cd $BENCHMARKS
