@@ -18,11 +18,11 @@ az vm create \
 done
 
 #Create 8 virtual machines from A10 template.
-for i in `seq 1 8`; do
+for i in `seq 12 17`; do
 az vm create \
     --admin-username iscc \
     --resource-group ISCC-2020 \
-    --name try10 \
+    --name try$i \
     --size Standard_A10 \
     --location westus \
     --image UbuntuLTS \

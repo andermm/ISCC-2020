@@ -1,6 +1,8 @@
 #2 - Install the dependencies
-nome=(gfortran openmpi-bin libopenmpi-dev)
-for (( n = 0; n < 3; n++ )); do
+sudo apt update -y && sudo apt upgrade -y
+
+nome=(make gfortran openmpi-bin libopenmpi-dev)
+for (( n = 0; n < 4; n++ )); do
 	packets=$(dpkg --get-selections | grep ${nome[n]})
 	if [ -n "$packets" ];
 	then
