@@ -79,8 +79,8 @@ done
 cd $BENCHMARKS
 appsa=alya
 git clone --recursive --progress https://gitlab.com/ammaliszewski/alya.git 2> $LOGS_DOWNLOAD/Alya.download.log
+mv alya Alya
 cp -r Alya $LOGS_BACKUP_SRC_CODE
-mv alya Alya_Exec
 cd $ALYAE_DIR
 cp configure.in/config_gfortran.in config.in
 sed -i 's,mpif90,mpifort,g' config.in
@@ -92,7 +92,7 @@ make metis4; make
 cd $BENCHMARKS
 wget -c https://www.nas.nasa.gov/assets/npb/NPB3.4.tar.gz -S -a $LOGS_DOWNLOAD/NPB3.4.download.log
 cp -r NPB3.4.tar.gz $LOGS_BACKUP_SRC_CODE
-tar -xzf NPB3.4.tar.gz --transform="s/NPB3.4/NPB3.4_Exec/"; cp -r NPB3.4_Exec NPB3.4_Charac
+tar -xzf NPB3.4.tar.gz
 rm -rf NPB3.4.tar.gz
 
 for f in $APP_CONFIG_NPBE/*.def.template; do
