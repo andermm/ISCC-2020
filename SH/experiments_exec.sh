@@ -5,7 +5,7 @@
 #############################################################################################################
 
 #Variable Directories
-BASE=$HOME/iscc/ISCC-2020
+BASE=$HOME/ISCC-2020
 SCRIPTS=$BASE/SH
 BENCHMARKS=$BASE/BENCHMARKS
 LOGS=$BASE/LOGS
@@ -77,7 +77,7 @@ done
 ########################################Alya################################################
 #Exec
 cd $BENCHMARKS
-apps-alya=(alya)
+appsa=alya
 git clone --recursive --progress https://gitlab.com/ammaliszewski/alya.git 2> $LOGS_DOWNLOAD/Alya.download.log
 cp -r Alya $LOGS_BACKUP_SRC_CODE
 mv alya Alya_Exec; cp -r Alya_Exec Alya_Charac
@@ -100,13 +100,13 @@ for f in $APP_CONFIG_NPBE/*.def.template; do
 done
 
 sed -i 's,mpif90,mpifort,g' $APP_CONFIG_NPBE/make.def
-apps-npb=(bt ep cg mg sp lu is ft)
+appsn=(bt ep cg mg sp lu is ft)
 classes=(C)
 echo -n "" > $APP_CONFIG_NPBE/suite.def
 
 for (( n = 0; n < 8; n++ )); do
 	for (( i = 0; i < 1; i++ )); do
-		echo -e ${apps-npb[n]}"\t"${classes[i]} >> $APP_CONFIG_NPBE/suite.def
+		echo -e ${appsn[n]}"\t"${classes[i]} >> $APP_CONFIG_NPBE/suite.def
 	done
 done
 cd $APP_COMPILE_NPBE; make suite
@@ -114,7 +114,7 @@ cd $APP_COMPILE_NPBE; make suite
 
 #################################Intel MPI Benchmarks#############################################
 cd $BENCHMARKS
-apps-intel=(intel)
+appsi=intel
 git clone --recursive --progress https://github.com/intel/mpi-benchmarks.git 2> $LOGS_DOWNLOAD/mpi-benchmarks.download.log
 cp -r mpi-benchmarks $LOGS_BACKUP_SRC_CODE
 sed -i 's,mpiicc,mpicc,g' $INTEL_SOURCE

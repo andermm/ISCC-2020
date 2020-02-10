@@ -1,4 +1,7 @@
 BASE=$HOME/ISCC-2020
+
+mkdir -p $BASE/LOGS/SYS_INFO
+
 CONTROL_FILE_OUTPUT=$BASE/LOGS/SYS_INFO/env_info.org
 
 lstopo $BASE/LOGS/SYS_INFO/$hostname.pdf
