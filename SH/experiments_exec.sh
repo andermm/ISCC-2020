@@ -33,19 +33,19 @@ INTEL_SOURCE=$INTEL/src_cpp/Makefile
 APP_BIN_INTEL=$INTEL/IMB-MPI1
 APP_TEST_INTEL=PingPong
 
+#Instance
+if [[ ${HOSTNAME:0:3} == A10 ]]; then
+INSTANCE=A10
+else
+INSTANCE=A8
+fi
+
 #Other Variables
 START=`date +"%d-%m-%Y.%Hh%Mm%Ss"`
-if [[ ${HOSTNAME:0:3} == A10 ]]; then
-	OUTPUT_APPS_EXEC=$LOGS/exec_A10.$START.csv
-	OUTPUT_INTEL_EXEC=$LOGS/intel_A10.$START.csv
-	CONTROL_FILE_OUTPUT=$BASE/LOGS/SYS_INFO/env_info_A10.org
-	PARTITION=(A10ISCC1 A10ISCC2 A10ISCC3 A10ISCC4 A10ISCC5 A10ISCC6 A10ISCC7 A10ISCC8)
-else
-	OUTPUT_APPS_EXEC=$LOGS/exec_A8.$START.csv
-	OUTPUT_INTEL_EXEC=$LOGS/intel_A8.$START.csv
-	CONTROL_FILE_OUTPUT=$BASE/LOGS/SYS_INFO/env_info_A8.org
-	PARTITION=(A8ISCC1 A8ISCC2 A8ISCC3 A8ISCC4 A8ISCC5 A8ISCC6 A8ISCC7 A8ISCC8)
-fi
+OUTPUT_APPS_EXEC=$LOGS/exec_$INSTANCE.$START.csv
+OUTPUT_INTEL_EXEC=$LOGS/intel_$INSTANCE.$START.csv
+CONTROL_FILE_OUTPUT=$BASE/LOGS/SYS_INFO/env_info_$INSTANCE.org
+PARTITION=('$INSTANCE'ISCC1 '$INSTANCE'ISCC2 '$INSTANCE'ISCC3 '$INSTANCE'ISCC4 '$INSTANCE'ISCC5 '$INSTANCE'ISCC6 '$INSTANCE'ISCC7 '$INSTANCE'ISCC8)
 
 #############################################################################################################
 #######################Step 2: Create the Folders/Download and Compile the Programs##########################
@@ -78,11 +78,10 @@ done
 #Exec
 cd $BENCHMARKS
 appsa=alya
-git clone --recursive --progress https://gitlab.com/ammaliszewski/alya.git 2> $LOGS_DOWNLOAD/Alya.download.log
-mv alya Alya
-cp -r Alya $LOGS_BACKUP_SRC_CODE
-tar -zcvf $LOGS_BACKUP_SRC_CODE/Alya.tar.gz $LOGS_BACKUP_SRC_CODE/Alya
-rm -rf $LOGS_BACKUP_SRC_CODE/Alya;
+git clone --recursive --progress https://gitlab.com/ammaliszewski/alya.git 2> $LOGS_DOWNLOAD/Alya_$INSTANCE.download.log
+cp -r alya $LOGS_BACKUP_SRC_CODE
+tar -zcvf $LOGS_BACKUP_SRC_CODE/Alya_$INSTANCE.tar.gz $LOGS_BACKUP_SRC_CODE/alya
+rm -rf $LOGS_BACKUP_SRC_CODE/alya;
 cd $ALYAE_DIR
 cp configure.in/config_gfortran.in config.in
 sed -i 's,mpif90,mpifort,g' config.in
@@ -92,8 +91,8 @@ make metis4; make
 #######################################NPB##################################################
 #Exec
 cd $BENCHMARKS
-wget -c https://www.nas.nasa.gov/assets/npb/NPB3.4.tar.gz -S -a $LOGS_DOWNLOAD/NPB3.4.download.log
-cp -r NPB3.4.tar.gz $LOGS_BACKUP_SRC_CODE
+wget -c https://www.nas.nasa.gov/assets/npb/NPB3.4.tar.gz -S -a $LOGS_DOWNLOAD/NPB3.4_$INSTANCE.download.log
+cp -r NPB3.4.tar.gz $LOGS_BACKUP_SRC_CODE; mv $LOGS_BACKUP_SRC_CODE/NPB3.4.tar.gz $LOGS_BACKUP_SRC_CODE/NPB3.4_$INSTANCE.tar.gz
 tar -xzf NPB3.4.tar.gz
 rm -rf NPB3.4.tar.gz
 
@@ -117,9 +116,9 @@ cd $APP_COMPILE_NPBE; make suite
 #################################Intel MPI Benchmarks#############################################
 cd $BENCHMARKS
 appsi=intel
-git clone --recursive --progress https://github.com/intel/mpi-benchmarks.git 2> $LOGS_DOWNLOAD/mpi-benchmarks.download.log
+git clone --recursive --progress https://github.com/intel/mpi-benchmarks.git 2> $LOGS_DOWNLOAD/mpi-benchmarks_$INSTANCE.download.log
 cp -r mpi-benchmarks $LOGS_BACKUP_SRC_CODE
-tar -zcvf $LOGS_BACKUP_SRC_CODE/mpi-benchmarks.tar.gz $LOGS_BACKUP_SRC_CODE/mpi-benchmarks
+tar -zcvf $LOGS_BACKUP_SRC_CODE/mpi-benchmarks_$INSTANCE.tar.gz $LOGS_BACKUP_SRC_CODE/mpi-benchmarks
 rm -rf $LOGS_BACKUP_SRC_CODE/mpi-benchmarks
 sed -i 's,mpiicc,mpicc,g' $INTEL_SOURCE
 sed -i 's,mpiicpc,mpicxx,g' $INTEL_SOURCE
@@ -130,11 +129,9 @@ cd $BASE
 #############################################################################################################
 
 #Define the machine file and Experimental Project
-MACHINEFILE_A8=$MACHINE_FILE/nodes_A8
-MACHINEFILE_A10=$MACHINE_FILE/nodes_A10
-MACHINEFILE_INTEL_A8=$MACHINE_FILE/nodes_intel_A8
-MACHINEFILE_INTEL_A10=$MACHINE_FILE/nodes_intel_A10
-PROJECT=$MACHINE_FILE/experimental_project.csv
+MACHINEFILE=$MACHINE_FILE/nodes_$INSTANCE
+MACHINEFILE_INTEL=$MACHINE_FILE/nodes_intel$INSTANCE
+PROJECT=$MACHINE_FILE/experimental_project_$INSTANCE.csv
 
 for (( i = 0; i < 30; i++ )); do
 	echo $appsa >> /tmp/expd
@@ -145,7 +142,7 @@ for (( i = 0; i < 30; i++ )); do
 done
 
 shuf /tmp/expd -o /tmp/exp
-awk '{print NR "," $0} END{print ""}' /tmp/exp > $MACHINE_FILE/experimental_project.csv
+awk '{print NR "," $0} END{print ""}' /tmp/exp > $MACHINE_FILE/experimental_project_$INSTANCE.csv
 sed -i '1s/^/number,apps\n/' $PROJECT
 rm /tmp/expd /tmp/exp 
 #############################################################################################################
@@ -168,7 +165,7 @@ do
 	runline+="mpiexec --mca btl self,"
 	
 #Select interface
-	if [[ ${HOSTNAME:0:3} == A10 ]]; then
+	if [[ $INSTANCE == A10 ]]; then
 		runline+="tcp --mca btl_tcp_if_include eth0 "
 	else
 		runline+="openib --mca btl_openib_if_include mlx5_0:1 "	
@@ -177,20 +174,11 @@ do
 #Select app
 	if [[ $apps == intel ]]; then
 		PROCS=2
-		runline+="-np $PROCS -machinefile" 
-		if [[ ${HOSTNAME:0:3} == A10 ]]; then
-			runline+=" $MACHINEFILE_INTEL_A10 "
-			else
-			runline+=" $MACHINEFILE_INTEL_A8 "
-		fi 
+		runline+="-np $PROCS -machinefile $MACHINEFILE_INTEL "
+		
 	else
 		PROCS=64
-		runline+="-np $PROCS -machinefile" 
-		if [[ ${HOSTNAME:0:3} == A10 ]]; then
-			runline+=" $MACHINEFILE_A10 "
-			else
-			runline+=" $MACHINEFILE_A8 "
-		fi
+		runline+="-np $PROCS -machinefile $MACHINEFILE "
 fi		
 #Save the output according to the app
 	if [[ $apps == intel ]]; then
