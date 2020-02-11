@@ -166,7 +166,7 @@ do
 	runline+="mpiexec --mca btl self,"
 	
 #Select interface
-	if [[ $(eval hostaname) == A10ISCC1 ]]; then
+	if [[ $(eval hostname) == A10ISCC1 ]]; then
 		runline+="tcp --mca btl_tcp_if_include eth0 "
 	else
 		runline+="openib --mca btl_openib_if_include mlx5_0:1 "	
