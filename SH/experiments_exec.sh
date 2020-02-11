@@ -179,19 +179,19 @@ do
 		PROCS=2
 		runline+="-np $PROCS -machinefile" 
 		if [[ ${HOSTNAME:0:3} == A10 ]]; then
-			runline+=" $MACHINEFILE_INTEL_A10"
+			runline+=" $MACHINEFILE_INTEL_A10 "
 			else
-			runline+=" $MACHINEFILE_INTEL_A8"
+			runline+=" $MACHINEFILE_INTEL_A8 "
 		fi 
 	else
 		PROCS=64
 		runline+="-np $PROCS -machinefile" 
 		if [[ ${HOSTNAME:0:3} == A10 ]]; then
-			runline+=" $MACHINEFILE_A10"
+			runline+=" $MACHINEFILE_A10 "
 			else
-			runline+=" $MACHINEFILE_A8"
+			runline+=" $MACHINEFILE_A8 "
 		fi
-		
+fi		
 #Save the output according to the app
 	if [[ $apps == intel ]]; then
 		runline+="$BENCHMARKS/$APP_BIN_INTEL $APP_TEST_INTEL "
@@ -214,6 +214,7 @@ do
 	eval "$runline < /dev/null"
 	
 	#Save the output according to the app
+
 	if [[ $apps == intel ]]; then
 		N=`tail -n +35 /tmp/intel_mb.out | awk {'print $1'} | grep -v '[^ 0.0-9.0]' | sed '/^[[:space:]]*$/d' | wc -l`
 		for (( i = 0; i < $N; i++ )); do
@@ -236,7 +237,10 @@ do
 	fi
 
 	echo "Done!"
+
 done
+
+
 sed -i '1s/^/apps,time\n/' $OUTPUT_APPS_EXEC
 sed -i '1s/^/apps,bytes,time,mbytes-sec\n/' $OUTPUT_INTEL_EXEC
 
