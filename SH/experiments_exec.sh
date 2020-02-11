@@ -20,7 +20,7 @@ APP_CONFIG_NPBE=$NPBE/NPB3.4-MPI/config
 APP_COMPILE_NPBE=$NPBE/NPB3.4-MPI
 
 #Alya Exec Variables
-ALYAE=Alya
+ALYAE=alya
 ALYAE_DIR=$ALYAE/Executables/unix
 APP_BIN_ALYAE=$ALYAE_DIR/Alya.x
 APP_CONFIG_ALYAE=$ALYAE/Executables/unix/config.in
@@ -88,6 +88,12 @@ cp configure.in/config_gfortran.in config.in
 sed -i 's,mpif90,mpifort,g' config.in
 ./configure -x nastin parall
 make metis4; make
+
+cp: cannot stat 'configure.in/config_gfortran.in': No such file or directory
+sed: can't read config.in: No such file or directory
+./SH/experiments_exec.sh: line 89: ./configure: No such file or directory
+make: *** No rule to make target 'metis4'.  Stop.
+make: *** No targets specified and no makefile found.  Stop.
 
 #######################################NPB##################################################
 #Exec
