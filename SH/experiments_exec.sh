@@ -150,6 +150,7 @@ rm /tmp/expd /tmp/exp
 #############################################################################################################
 
 #Read the experimental project
+tail -n +2 $PROJECT |
 while IFS=, read -r number apps
 do
 
