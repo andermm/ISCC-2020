@@ -173,7 +173,7 @@ do
 	fi
 
 #Select app
-	if [[ $apps == exec_intel ]]; then
+	if [[ $apps == intel ]]; then
 		PROCS=2
 		runline+="-np $PROCS -machinefile $MACHINEFILE_INTEL "
 	else
@@ -182,18 +182,18 @@ do
 	fi
 
 #Save the output according to the app
-	if [[ $apps == exec_intel ]]; then
+	if [[ $apps == intel ]]; then
 		runline+="$BENCHMARKS/$APP_BIN_INTEL $APP_TEST_INTEL "
 		runline+="2>> $LOGS/apps_exec_std_error "
 		runline+="&> >(tee -a $LOGS/LOGS_BACKUP/$apps.log > /tmp/intel_mb.out)"
 
-	elif [[ $apps == exec_alya ]]; then
+	elif [[ $apps == alya ]]; then
 		runline+="$BENCHMARKS/$APP_BIN_ALYAE BENCHMARKS/$APP_ALYAE_TUFAN "
 		runline+="2 >> $LOGS/apps_exec_std_error "
 		runline+="&> >(tee -a $LOGS/LOGS_BACKUP/$apps.log > /tmp/alya.out)"
 	
 	else
-		runline+="$BENCHMARKS/$APP_BIN_NPBE/${apps:5:7}.C.x "
+		runline+="$BENCHMARKS/$APP_BIN_NPBE/$apps.C.x "
 		runline+="2>> $LOGS/apps_exec_std_error "
 		runline+="&> >(tee -a $LOGS/LOGS_BACKUP/$apps.log > /tmp/nas.out)"	
 	fi	
@@ -203,7 +203,7 @@ do
 	eval "$runline < /dev/null"
 	
 	#Save the output according to the app
-	if [[ $apps == exec_intel ]]; then
+	if [[ $apps == intel ]]; then
 		N=`tail -n +35 /tmp/intel_mb.out | awk {'print $1'} | grep -v '[^ 0.0-9.0]' | sed '/^[[:space:]]*$/d' | wc -l`
 		for (( i = 0; i < $N; i++ )); do
 			echo "$apps" >> /tmp/for.out
@@ -215,7 +215,7 @@ do
     	paste -d"," /tmp/for.out /tmp/BYTES /tmp/TIME /tmp/Mbytes >> $OUTPUT_INTEL_EXEC
     	rm /tmp/for.out; rm /tmp/BYTES; rm /tmp/TIME; rm /tmp/Mbytes
 		
-	elif [[ $apps == exec_alya ]]; then
+	elif [[ $apps == alya ]]; then
 		TIME=`cat $BENCHMARKS/$ALYAE_LOG | grep "TOTAL CPU TIME" | awk '{print $4}'`
 		echo "$apps,$TIME" >> $OUTPUT_APPS_EXEC
 	
