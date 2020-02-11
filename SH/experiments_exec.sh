@@ -35,7 +35,7 @@ APP_TEST_INTEL=PingPong
 
 #Other Variables
 START=`date +"%d-%m-%Y.%Hh%Mm%Ss"`
-if [[ $(eval hostname) == A10ISCC1 ]]; then
+if [[ ${HOSTNAME:0:3} == A10 ]]; then
 	OUTPUT_APPS_EXEC=$LOGS/exec_A10.$START.csv
 	OUTPUT_INTEL_EXEC=$LOGS/intel_A10.$START.csv
 	CONTROL_FILE_OUTPUT=$BASE/LOGS/SYS_INFO/env_info_A10.org
@@ -130,8 +130,10 @@ cd $BASE
 #############################################################################################################
 
 #Define the machine file and Experimental Project
-MACHINEFILE=$MACHINE_FILE/nodes
-MACHINEFILE_INTEL=$MACHINE_FILE/nodes_intel
+MACHINEFILE_A8=$MACHINE_FILE/nodes_A8
+MACHINEFILE_A10=$MACHINE_FILE/nodes_A10
+MACHINEFILE_INTEL_A8=$MACHINE_FILE/nodes_intel_A8
+MACHINEFILE_INTEL_A10=$MACHINE_FILE/nodes_intel_A10
 PROJECT=$MACHINE_FILE/experimental_project.csv
 
 for (( i = 0; i < 30; i++ )); do
@@ -166,7 +168,7 @@ do
 	runline+="mpiexec --mca btl self,"
 	
 #Select interface
-	if [[ $(eval hostname) == A10ISCC1 ]]; then
+	if [[ ${HOSTNAME:0:3} == A10 ]]; then
 		runline+="tcp --mca btl_tcp_if_include eth0 "
 	else
 		runline+="openib --mca btl_openib_if_include mlx5_0:1 "	
@@ -175,12 +177,21 @@ do
 #Select app
 	if [[ $apps == intel ]]; then
 		PROCS=2
-		runline+="-np $PROCS -machinefile $MACHINEFILE_INTEL "
+		runline+="-np $PROCS -machinefile" 
+		if [[ ${HOSTNAME:0:3} == A10 ]]; then
+			runline+=" $MACHINEFILE_INTEL_A10"
+			else
+			runline+=" $MACHINEFILE_INTEL_A8"
+		fi 
 	else
 		PROCS=64
-		runline+="-np $PROCS -machinefile $MACHINEFILE "
-	fi
-
+		runline+="-np $PROCS -machinefile" 
+		if [[ ${HOSTNAME:0:3} == A10 ]]; then
+			runline+=" $MACHINEFILE_A10"
+			else
+			runline+=" $MACHINEFILE_A8"
+		fi
+		
 #Save the output according to the app
 	if [[ $apps == intel ]]; then
 		runline+="$BENCHMARKS/$APP_BIN_INTEL $APP_TEST_INTEL "

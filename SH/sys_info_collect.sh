@@ -1,7 +1,7 @@
 BASE=$HOME/ISCC-2020
 
 
-if [[ ${HOSTNAME:0:2} == A1 ]]; then
+if [[ ${HOSTNAME:0:3} == A10 ]]; then
 	CONTROL_FILE_OUTPUT=$BASE/LOGS/SYS_INFO/env_info_A10.org
 else
 	CONTROL_FILE_OUTPUT=$BASE/LOGS/SYS_INFO/env_info_A8.org
