@@ -144,6 +144,7 @@ done
 
 shuf /tmp/expd -o /tmp/exp
 awk '{print NR "," $0} END{print ""}' /tmp/exp > $MACHINE_FILE/experimental_project.csv
+sed -i '1s/^/number,apps\n/' $PROJECT
 rm /tmp/expd /tmp/exp 
 #############################################################################################################
 #######################Step 5: Read the Experimental Project and Started the Execution Loop##################
