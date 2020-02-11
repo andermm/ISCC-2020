@@ -45,8 +45,8 @@ START=`date +"%d-%m-%Y.%Hh%Mm%Ss"`
 OUTPUT_APPS_EXEC=$LOGS/exec_$INSTANCE.$START.csv
 OUTPUT_INTEL_EXEC=$LOGS/intel_$INSTANCE.$START.csv
 CONTROL_FILE_OUTPUT=$BASE/LOGS/SYS_INFO/env_info_$INSTANCE.org
-PARTITION=($INSTANCEISCC1 $INSTANCEISCC2 $INSTANCEISCC3 
-$INSTANCEISCC4 $INSTANCEISCC5 $INSTANCEISCC6 $INSTANCEISCC7 $INSTANCEISCC8)
+PARTITION=(${INSTANCE}ISCC1 ${INSTANCE}ISCC2 ${INSTANCE}ISCC3 ${INSTANCE}ISCC4 
+	${INSTANCE}ISCC5 ${INSTANCE}ISCC6 ${INSTANCE}ISCC7 ${INSTANCE}ISCC8)
 
 #############################################################################################################
 #######################Step 2: Create the Folders/Download and Compile the Programs##########################
@@ -193,7 +193,7 @@ fi
 		runline+="&> >(tee -a $LOGS/LOGS_BACKUP/$apps_$INSTANCE.log > /tmp/alya.out)"
 	
 	else
-		runline+="$BENCHMARKS/$APP_BIN_NPBE/$apps.C.x "
+		runline+="$BENCHMARKS/$APP_BIN_NPBE/$apps.D.x "
 		runline+="2>> $LOGS/apps_exec_std_error "
 		runline+="&> >(tee -a $LOGS/LOGS_BACKUP/$apps_$INSTANCE.log > /tmp/nas.out)"	
 	fi	
