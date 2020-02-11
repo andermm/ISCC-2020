@@ -81,6 +81,8 @@ appsa=alya
 git clone --recursive --progress https://gitlab.com/ammaliszewski/alya.git 2> $LOGS_DOWNLOAD/Alya.download.log
 mv alya Alya
 cp -r Alya $LOGS_BACKUP_SRC_CODE
+tar -zcvf $LOGS_BACKUP_SRC_CODE/Alya.tar.gz $LOGS_BACKUP_SRC_CODE/Alya
+rm -rf $LOGS_BACKUP_SRC_CODE/Alya;
 cd $ALYAE_DIR
 cp configure.in/config_gfortran.in config.in
 sed -i 's,mpif90,mpifort,g' config.in
@@ -117,6 +119,8 @@ cd $BENCHMARKS
 appsi=intel
 git clone --recursive --progress https://github.com/intel/mpi-benchmarks.git 2> $LOGS_DOWNLOAD/mpi-benchmarks.download.log
 cp -r mpi-benchmarks $LOGS_BACKUP_SRC_CODE
+tar -zcvf $LOGS_BACKUP_SRC_CODE/mpi-benchmarks.tar.gz $LOGS_BACKUP_SRC_CODE/mpi-benchmarks
+rm -rf $LOGS_BACKUP_SRC_CODE/mpi-benchmarks
 sed -i 's,mpiicc,mpicc,g' $INTEL_SOURCE
 sed -i 's,mpiicpc,mpicxx,g' $INTEL_SOURCE
 cd $INTEL; make IMB-MPI1
