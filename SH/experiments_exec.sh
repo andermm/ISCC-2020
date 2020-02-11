@@ -45,7 +45,8 @@ START=`date +"%d-%m-%Y.%Hh%Mm%Ss"`
 OUTPUT_APPS_EXEC=$LOGS/exec_$INSTANCE.$START.csv
 OUTPUT_INTEL_EXEC=$LOGS/intel_$INSTANCE.$START.csv
 CONTROL_FILE_OUTPUT=$BASE/LOGS/SYS_INFO/env_info_$INSTANCE.org
-PARTITION=('$INSTANCE'ISCC1 '$INSTANCE'ISCC2 '$INSTANCE'ISCC3 '$INSTANCE'ISCC4 '$INSTANCE'ISCC5 '$INSTANCE'ISCC6 '$INSTANCE'ISCC7 '$INSTANCE'ISCC8)
+PARTITION=($INSTANCEISCC1 $INSTANCEISCC2 $INSTANCEISCC3 
+$INSTANCEISCC4 $INSTANCEISCC5 $INSTANCEISCC6 $INSTANCEISCC7 $INSTANCEISCC8)
 
 #############################################################################################################
 #######################Step 2: Create the Folders/Download and Compile the Programs##########################
@@ -102,7 +103,7 @@ done
 
 sed -i 's,mpif90,mpifort,g' $APP_CONFIG_NPBE/make.def
 appsn=(bt ep cg mg sp lu is ft)
-classes=(C)
+classes=(D)
 echo -n "" > $APP_CONFIG_NPBE/suite.def
 
 for (( n = 0; n < 8; n++ )); do
@@ -130,7 +131,7 @@ cd $BASE
 
 #Define the machine file and Experimental Project
 MACHINEFILE=$MACHINE_FILE/nodes_$INSTANCE
-MACHINEFILE_INTEL=$MACHINE_FILE/nodes_intel$INSTANCE
+MACHINEFILE_INTEL=$MACHINE_FILE/nodes_intel_$INSTANCE
 PROJECT=$MACHINE_FILE/experimental_project_$INSTANCE.csv
 
 for (( i = 0; i < 30; i++ )); do
@@ -184,17 +185,17 @@ fi
 	if [[ $apps == intel ]]; then
 		runline+="$BENCHMARKS/$APP_BIN_INTEL $APP_TEST_INTEL "
 		runline+="2>> $LOGS/apps_exec_std_error "
-		runline+="&> >(tee -a $LOGS/LOGS_BACKUP/$apps.log > /tmp/intel_mb.out)"
+		runline+="&> >(tee -a $LOGS/LOGS_BACKUP/$apps_$INSTANCE.log > /tmp/intel_mb.out)"
 
 	elif [[ $apps == alya ]]; then
 		runline+="$BENCHMARKS/$APP_BIN_ALYAE BENCHMARKS/$APP_ALYAE_TUFAN "
 		runline+="2 >> $LOGS/apps_exec_std_error "
-		runline+="&> >(tee -a $LOGS/LOGS_BACKUP/$apps.log > /tmp/alya.out)"
+		runline+="&> >(tee -a $LOGS/LOGS_BACKUP/$apps_$INSTANCE.log > /tmp/alya.out)"
 	
 	else
 		runline+="$BENCHMARKS/$APP_BIN_NPBE/$apps.C.x "
 		runline+="2>> $LOGS/apps_exec_std_error "
-		runline+="&> >(tee -a $LOGS/LOGS_BACKUP/$apps.log > /tmp/nas.out)"	
+		runline+="&> >(tee -a $LOGS/LOGS_BACKUP/$apps_$INSTANCE.log > /tmp/nas.out)"	
 	fi	
 
 #Execute the experiments
