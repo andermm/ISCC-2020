@@ -148,7 +148,7 @@ while IFS=, read -r apps instace number
 do
 
 #Define a single key
-	KEY="$number-$apps-instance"
+	KEY="$number-$apps-$instance"
 	echo ""
 	echo $KEY
 	echo ""
