@@ -10,7 +10,9 @@ SCRIPTS=$BASE/SH
 BENCHMARKS=$BASE/BENCHMARKS
 LOGS=$BASE/LOGS
 MACHINE_FILE=$BASE/MACHINE_FILES
+DoE=$MACHINE_FILES/DoE.R
 LOGS_DOWNLOAD=$LOGS/LOGS_DOWNLOAD
+LOGS_CSV=$LOGS/LOGS_CSV
 LOGS_BACKUP_SRC_CODE=$LOGS/LOGS_BACKUP_SRC_CODE
 
 #NPB Variables
@@ -33,20 +35,20 @@ INTEL_SOURCE=$INTEL/src_cpp/Makefile
 APP_BIN_INTEL=$INTEL/IMB-MPI1
 APP_TEST_INTEL=PingPong
 
-#Instance
+#Environment
 if [[ ${HOSTNAME:0:3} == A10 ]]; then
-INSTANCE=A10
-else
-INSTANCE=A8
+	instance=A10
+else 
+	instance=A8
 fi
 
 #Other Variables
 START=`date +"%d-%m-%Y.%Hh%Mm%Ss"`
-OUTPUT_APPS_EXEC=$LOGS/exec_$INSTANCE.$START.csv
-OUTPUT_INTEL_EXEC=$LOGS/intel_$INSTANCE.$START.csv
-CONTROL_FILE_OUTPUT=$BASE/LOGS/SYS_INFO/env_info_$INSTANCE.org
-PARTITION=(${INSTANCE}ISCC1 ${INSTANCE}ISCC2 ${INSTANCE}ISCC3 ${INSTANCE}ISCC4 
-	${INSTANCE}ISCC5 ${INSTANCE}ISCC6 ${INSTANCE}ISCC7 ${INSTANCE}ISCC8)
+OUTPUT_APPS_EXEC=$LOGS_CSV/exec_$instance.$START.csv
+OUTPUT_INTEL_EXEC=$LOGS_CSV/intel_$instance.$START.csv
+CONTROL_FILE_OUTPUT=$BASE/LOGS/SYS_INFO/env_info_$instance.org
+PARTITION=(${instance}ISCC1 ${instance}ISCC2 ${instance}ISCC3 ${instance}ISCC4 
+	${instance}ISCC5 ${instance}ISCC6 ${instance}ISCC7 ${instance}ISCC8)
 
 #############################################################################################################
 #######################Step 2: Create the Folders/Download and Compile the Programs##########################
@@ -56,6 +58,7 @@ mkdir -p $BENCHMARKS
 mkdir -p $LOGS
 mkdir -p $BASE/LOGS/LOGS_BACKUP
 mkdir -p $LOGS_DOWNLOAD
+mkdir -p $LOGS_CSV
 mkdir -p $LOGS_BACKUP_SRC_CODE
 
 #############################################################################################################
@@ -79,9 +82,9 @@ done
 #Exec
 cd $BENCHMARKS
 appsa=alya
-git clone --recursive --progress https://gitlab.com/ammaliszewski/alya.git 2> $LOGS_DOWNLOAD/Alya_$INSTANCE.download.log
+git clone --recursive --progress https://gitlab.com/ammaliszewski/alya.git 2> $LOGS_DOWNLOAD/Alya_$instance.download.log
 cp -r alya $LOGS_BACKUP_SRC_CODE
-tar -zcvf $LOGS_BACKUP_SRC_CODE/Alya_$INSTANCE.tar.gz $LOGS_BACKUP_SRC_CODE/alya
+tar -zcvf $LOGS_BACKUP_SRC_CODE/Alya_$instance.tar.gz $LOGS_BACKUP_SRC_CODE/alya
 rm -rf $LOGS_BACKUP_SRC_CODE/alya;
 cd $ALYAE_DIR
 cp configure.in/config_gfortran.in config.in
@@ -92,8 +95,8 @@ make metis4; make
 #######################################NPB##################################################
 #Exec
 cd $BENCHMARKS
-wget -c https://www.nas.nasa.gov/assets/npb/NPB3.4.tar.gz -S -a $LOGS_DOWNLOAD/NPB3.4_$INSTANCE.download.log
-cp -r NPB3.4.tar.gz $LOGS_BACKUP_SRC_CODE; mv $LOGS_BACKUP_SRC_CODE/NPB3.4.tar.gz $LOGS_BACKUP_SRC_CODE/NPB3.4_$INSTANCE.tar.gz
+wget -c https://www.nas.nasa.gov/assets/npb/NPB3.4.tar.gz -S -a $LOGS_DOWNLOAD/NPB3.4_$instance.download.log
+cp -r NPB3.4.tar.gz $LOGS_BACKUP_SRC_CODE; mv $LOGS_BACKUP_SRC_CODE/NPB3.4.tar.gz $LOGS_BACKUP_SRC_CODE/NPB3.4_$instance.tar.gz
 tar -xzf NPB3.4.tar.gz
 rm -rf NPB3.4.tar.gz
 
@@ -117,9 +120,9 @@ cd $APP_COMPILE_NPBE; make suite
 #################################Intel MPI Benchmarks#############################################
 cd $BENCHMARKS
 appsi=intel
-git clone --recursive --progress https://github.com/intel/mpi-benchmarks.git 2> $LOGS_DOWNLOAD/mpi-benchmarks_$INSTANCE.download.log
+git clone --recursive --progress https://github.com/intel/mpi-benchmarks.git 2> $LOGS_DOWNLOAD/mpi-benchmarks_$instance.download.log
 cp -r mpi-benchmarks $LOGS_BACKUP_SRC_CODE
-tar -zcvf $LOGS_BACKUP_SRC_CODE/mpi-benchmarks_$INSTANCE.tar.gz $LOGS_BACKUP_SRC_CODE/mpi-benchmarks
+tar -zcvf $LOGS_BACKUP_SRC_CODE/mpi-benchmarks_$instance.tar.gz $LOGS_BACKUP_SRC_CODE/mpi-benchmarks
 rm -rf $LOGS_BACKUP_SRC_CODE/mpi-benchmarks
 sed -i 's,mpiicc,mpicc,g' $INTEL_SOURCE
 sed -i 's,mpiicpc,mpicxx,g' $INTEL_SOURCE
@@ -130,33 +133,22 @@ cd $BASE
 #############################################################################################################
 
 #Define the machine file and Experimental Project
-MACHINEFILE=$MACHINE_FILE/nodes_$INSTANCE
-MACHINEFILE_INTEL=$MACHINE_FILE/nodes_intel_$INSTANCE
-PROJECT=$MACHINE_FILE/experimental_project_$INSTANCE.csv
+Rscript $DoE
+MACHINEFILE=$MACHINE_FILE/nodes_$instance
+MACHINEFILE_INTEL=$MACHINE_FILE/nodes_intel_$instance
+PROJECT=$MACHINE_FILE/experimental_project.csv
 
-for (( i = 0; i < 30; i++ )); do
-	echo $appsa >> /tmp/expd
-	echo $appsi >> /tmp/expd
-	for (( n = 0; n < 8; n++ )); do
-		echo ${appsn[n]} >> /tmp/expd
-	done
-done
-
-shuf /tmp/expd -o /tmp/exp
-awk '{print NR "," $0} END{print ""}' /tmp/exp > $MACHINE_FILE/experimental_project_$INSTANCE.csv
-sed -i '1s/^/number,apps\n/' $PROJECT
-rm /tmp/expd /tmp/exp 
 #############################################################################################################
 #######################Step 5: Read the Experimental Project and Started the Execution Loop##################
 #############################################################################################################
 
 #Read the experimental project
 tail -n +2 $PROJECT |
-while IFS=, read -r number apps
+while IFS=, read -r apps instace number 
 do
 
 #Define a single key
-	KEY="$number-$apps"
+	KEY="$number-$apps-instance"
 	echo ""
 	echo $KEY
 	echo ""
@@ -166,7 +158,7 @@ do
 	runline+="mpiexec --mca btl self,"
 	
 #Select interface
-	if [[ $INSTANCE == A10 ]]; then
+	if [[ $instance == A10 ]]; then
 		runline+="tcp --mca btl_tcp_if_include eth0 "
 	else
 		runline+="openib --mca btl_openib_if_include mlx5_0:1 "	
@@ -180,22 +172,22 @@ do
 	else
 		PROCS=64
 		runline+="-np $PROCS -machinefile $MACHINEFILE "
-fi		
+	fi		
 #Save the output according to the app
 	if [[ $apps == intel ]]; then
 		runline+="$BENCHMARKS/$APP_BIN_INTEL $APP_TEST_INTEL "
 		runline+="2>> $LOGS/apps_exec_std_error "
-		runline+="&> >(tee -a $LOGS/LOGS_BACKUP/$apps_$INSTANCE.log > /tmp/intel_mb.out)"
+		runline+="&> >(tee -a $LOGS/LOGS_BACKUP/$apps_$instance.log > /tmp/intel_mb.out)"
 
 	elif [[ $apps == alya ]]; then
 		runline+="$BENCHMARKS/$APP_BIN_ALYAE BENCHMARKS/$APP_ALYAE_TUFAN "
 		runline+="2 >> $LOGS/apps_exec_std_error "
-		runline+="&> >(tee -a $LOGS/LOGS_BACKUP/$apps_$INSTANCE.log > /tmp/alya.out)"
+		runline+="&> >(tee -a $LOGS/LOGS_BACKUP/$apps_$instance.log > /tmp/alya.out)"
 	
 	else
 		runline+="$BENCHMARKS/$APP_BIN_NPBE/$apps.D.x "
 		runline+="2>> $LOGS/apps_exec_std_error "
-		runline+="&> >(tee -a $LOGS/LOGS_BACKUP/$apps_$INSTANCE.log > /tmp/nas.out)"	
+		runline+="&> >(tee -a $LOGS/LOGS_BACKUP/$apps_$instance.log > /tmp/nas.out)"	
 	fi	
 
 #Execute the experiments
