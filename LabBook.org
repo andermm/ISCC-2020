@@ -179,7 +179,6 @@ to use Spack can be seen [[https://spack-tutorial.readthedocs.io/en/latest/][her
   will undoubtedly help describe the results or even add system
   information 
 
-
 ** Design of Experiments
 #+begin_src R :results output :session *R* :exports both
 options(crayon.enabled=FALSE)
@@ -267,39 +266,46 @@ step is to read the CSV files.
 #+begin_src R :results output :session *R* :exports both
 options(crayon.enabled=FALSE)
 suppressMessages(library("tidyverse"));
-df_intel <- read_csv("LOGS/LOGS_CSV/intel_A10.11-02-2020.12h02m47s.csv", progress=FALSE)
-df_apps <- read_csv("LOGS/LOGS_CSV/exec_A10.11-02-2020.12h02m47s.csv", progress=FALSE)
-    
-df_apps %>%
-      group_by(apps) %>%
-      summarise(
-        average=mean(time),
-        std=sd(time),
-        ste=3*std/sqrt(n()),
-        N=n()) %>%
-      arrange(apps) -> df_apps
-df_apps
+df_intel_A10 <- read_csv("LOGS/LOGS_CSV/intel_A10.11-02-2020.12h02m47s.csv", progress=FALSE)
+df_intel_F8 <- read_csv("LOGS/LOGS_CSV/intel_F8.29-02-2020.00h21m11s.csv", progress=FALSE)
+df_intel_DS4 <- read_csv("LOGS/LOGS_CSV/intel_DS4.28-02-2020.23h37m39s.csv", progress=FALSE)
+df_intel=bind_rows(df_intel_A10,df_intel_F8,df_intel_DS4)
+df_apps_A10 <- read_csv("LOGS/LOGS_CSV/exec_A10.11-02-2020.12h02m47s.csv", progress=FALSE)
+df_apps_F8 <- read_csv("LOGS/LOGS_CSV/exec_F8.29-02-2020.00h21m11s.csv", progress=FALSE)
+df_apps_DS4 <- read_csv("LOGS/LOGS_CSV/exec_DS4.28-02-2020.23h37m39s.csv", progress=FALSE)
+df_apps=bind_rows(df_apps_A10,df_apps_F8,df_apps_DS4)
+df_apps$apps=toupper(df_apps$apps)
 
-df_intel %>%
-  filter(bytes != 0) %>%
-  group_by(bytes) %>%
+df_apps %>%
+  group_by(apps,instance) %>%
   summarise(
     average=mean(time),
     std=sd(time),
     ste=3*std/sqrt(n()),
     N=n()) %>%
-  arrange(bytes) -> df_intel_latency
+  arrange(apps,instance) -> df_apps
+df_apps
+
+df_intel %>%
+  filter(bytes != 0) %>%
+  group_by(bytes,instance) %>%
+  summarise(
+    average=mean(time),
+    std=sd(time),
+    ste=3*std/sqrt(n()),
+    N=n()) %>%
+  arrange(bytes,instance) -> df_intel_latency
 df_intel_latency
 
 df_intel %>%
   filter(bytes != 0) %>%
-  group_by(bytes) %>%
+  group_by(bytes,instance) %>%
   summarise(
     average=(mean(`mbytes-sec`)/1000),
     std=(sd(`mbytes-sec`)/1000),
     ste=3*std/sqrt(n()),
     N=n()) %>%
-  arrange(bytes) -> df_intel_band
+  arrange(bytes,instance) -> df_intel_band
 df_intel_band
 
 #+end_src
@@ -312,279 +318,465 @@ cols(
   apps = col_character(),
   bytes = col_double(),
   time = col_double(),
-  `mbytes-sec` = col_double()
+  `mbytes-sec` = col_double(),
+  instance = col_character()
 )
 
 Parsed with column specification:
 cols(
   apps = col_character(),
-  time = col_double()
+  bytes = col_double(),
+  time = col_double(),
+  `mbytes-sec` = col_double(),
+  instance = col_character()
 )
 
-# A tibble: 10 x 5
-   apps  average    std    ste     N
+Parsed with column specification:
+cols(
+  apps = col_character(),
+  bytes = col_double(),
+  time = col_double(),
+  `mbytes-sec` = col_double(),
+  instance = col_character()
+)
+
+Parsed with column specification:
+cols(
+  apps = col_character(),
+  time = col_double(),
+  instance = col_character()
+)
+
+Parsed with column specification:
+cols(
+  apps = col_character(),
+  time = col_double(),
+  instance = col_character()
+)
+
+Parsed with column specification:
+cols(
+  apps = col_character(),
+  time = col_double(),
+  instance = col_character()
+)
+
+# A tibble: 27 x 6
+# Groups:   apps [9]
+   apps  instance average    std    ste     N
    <
-  <
+<
+     <
  <
  <
 <int>
- 1 alya    352.   2.47   1.35     30
- 2 bt      797.   4.36   2.39     30
- 3 cg      604.  22.3   12.2      30
- 4 ep       61.5  0.453  0.248    30
- 5 ft     1149.   8.47   4.64     30
- 6 is      111.   1.26   0.689    30
- 7 lu      483.   2.56   1.40     30
- 8 mg       66.6  0.581  0.318    30
- 9 sp     1144.  12.5    6.83     30
-10 <
-    NA   NA     NA         1
+ 1 ALYA  A10        352.   2.47   1.35     30
+ 2 ALYA  DS4        227.   1.000  0.548    30
+ 3 ALYA  F8         202.   2.76   1.51     30
+ 4 BT    A10        797.   4.36   2.39     30
+ 5 BT    DS4        578.   2.41   1.32     30
+ 6 BT    F8         414.   3.40   1.86     30
+ 7 CG    A10        604.  22.3   12.2      30
+ 8 CG    DS4        228.   0.997  0.546    30
+ 9 CG    F8         171.   2.54   1.39     30
+10 EP    A10         61.5  0.453  0.248    30
+# … with 17 more rows
 
-# A tibble: 23 x 5
-   bytes average   std   ste     N
+# A tibble: 69 x 6
+# Groups:   bytes [23]
+   bytes instance average   std   ste     N
    <
-  <
+<
+     <
 <
 <
 <int>
- 1     1    9.00 0.479 0.262    30
- 2     2    8.89 0.551 0.302    30
- 3     4    9.15 0.483 0.264    30
- 4     8    8.92 0.487 0.267    30
- 5    16    8.98 0.611 0.334    30
- 6    32    8.97 0.403 0.221    30
- 7    64    9.24 0.800 0.438    30
- 8   128    9.17 0.556 0.304    30
- 9   256    9.53 1.03  0.561    30
-10   512    9.46 0.915 0.501    30
-# … with 13 more rows
+ 1     1 A10         9.00 0.479 0.262    30
+ 2     1 DS4         6.78 0.485 0.266    30
+ 3     1 F8          6.14 0.532 0.292    30
+ 4     2 A10         8.89 0.551 0.302    30
+ 5     2 DS4         7.05 0.837 0.459    30
+ 6     2 F8          6.36 0.701 0.384    30
+ 7     4 A10         9.15 0.483 0.264    30
+ 8     4 DS4         6.78 0.455 0.249    30
+ 9     4 F8          6.34 1.25  0.683    30
+10     8 A10         8.92 0.487 0.267    30
+# … with 59 more rows
 
-# A tibble: 23 x 5
-   bytes  average        std        ste     N
+# A tibble: 69 x 6
+# Groups:   bytes [23]
+   bytes instance  average        std        ste     N
    <
-   <
+<
+      <
      <
      <
 <int>
- 1     1 0.000112 0.00000664 0.00000364    30
- 2     2 0.000225 0.0000128  0.00000701    30
- 3     4 0.000439 0.0000224  0.0000123     30
- 4     8 0.000900 0.0000463  0.0000254     30
- 5    16 0.00179  0.000111   0.0000608     30
- 6    32 0.00358  0.000151   0.0000827     30
- 7    64 0.00697  0.000505   0.000276      30
- 8   128 0.0140   0.000805   0.000441      30
- 9   256 0.0271   0.00232    0.00127       30
-10   512 0.0545   0.00399    0.00219       30
-# … with 13 more rows
+ 1     1 A10      0.000112 0.00000664 0.00000364    30
+ 2     1 DS4      0.000148 0.0000113  0.00000617    30
+ 3     1 F8       0.000164 0.0000133  0.00000728    30
+ 4     2 A10      0.000225 0.0000128  0.00000701    30
+ 5     2 DS4      0.000287 0.0000292  0.0000160     30
+ 6     2 F8       0.000318 0.0000348  0.0000190     30
+ 7     4 A10      0.000439 0.0000224  0.0000123     30
+ 8     4 DS4      0.000591 0.0000359  0.0000197     30
+ 9     4 F8       0.000647 0.0000875  0.0000479     30
+10     8 A10      0.000900 0.0000463  0.0000254     30
+# … with 59 more rows
 #+end_example
 **** PingPong - Latency
-#+begin_src R :results output graphics :file R/PLOTS/Latency.png :exports both :width 800 :height 350 :session *R* 
+#+begin_src R :results output graphics :file R/PLOTS/Latency-paper.pdf :exports both :width 4 :height 2.5 :session *R*  
+library("scales")
 ggplot(df_intel_latency,aes(x=bytes, y=average)) +
-  #geom_line(aes(color = interface), alpha = 1) +
-  #geom_point(aes(color=interface, shape=interface),size = 4) +
-  scale_shape_manual(values = c(15, 16),
-                     breaks=c("ib", "eth"),
-                     labels=c("InfiniBand FDR 56Gbps", "Ethernet 1Gbps")) +
-  geom_errorbar(aes(ymin=average-ste, ymax=average+ste, color=interface, group=interface), width = .2) +
-  theme_bw() +
-  scale_y_log10(breaks=c(0, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024)) +
-  scale_x_log10(breaks=c(0, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304)) +
-  ylab('Average Latency Time\n(Usec in 2 Log Scale)') +
+  geom_line(aes(color = instance), alpha = 0.5) +
+  geom_point(aes(color=instance, shape=instance),size = 2) +
+  scale_shape_manual(values = c(15,16,17),
+                     breaks=c("A10", "DS4" ,"F8"),
+                     labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +
+  geom_errorbar(aes(ymin=average-ste, ymax=average+ste, color=instance, group=instance), width = .25) +
+  theme_bw(base_size=12) +
+  scale_y_log10(breaks=c(1,4,16,64,256,1024), labels=trans_format("log2", math_format(2^.x))) +
+  scale_x_log10(breaks=c(1,4,16,64,256,1024,4096,16384,65536,262144,1048576,4194304), labels=trans_format("log2", math_format(2^.x))) +
+  ylab(expression(paste("Average Latency Time (",mu,"s)"))) +
   xlab('Message Size (Bytes)') +
-  scale_color_manual(values=c( "#BEBEBE", "#303030"),
-                    breaks=c("ib", "eth"),
-                    labels=c("InfiniBand FDR 56Gbps", "Ethernet 1Gbps")) +
-    theme (legend.position = c(0.2, 0.82),
-           legend.background = element_rect(color = "black", size = 0.5, linetype = "solid"),
-           plot.margin = unit(x = c(0.2, 0, 0, 0), units = "cm"),
-           axis.title=element_text(size=18), 
-           legend.title = element_blank(),
-           legend.text = element_text(color = "black", size = 18),
-           axis.text.x = element_text(angle=55, hjust=1, size =16, color = "black"),
-           axis.text.y = element_text(size =16, color = "black"))
+  scale_color_manual(values=c( "#ccc210", "#ab6857", "#808585"),
+                     breaks=c("A10", "DS4" ,"F8"),
+                     labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +
+  theme_bw(base_size = 13) +
+  theme (legend.position = c(0.3, 0.7),
+         legend.background = element_rect(color = "black", size = 0.3, linetype = "solid"),
+         plot.margin = unit(x = c(0, 0, 0, 0), units = "cm"),
+         axis.title=element_text(size=12),
+         legend.box.spacing = unit(0, "pt"), 
+         legend.title = element_blank(),
+         legend.text = element_text(color = "black", size = 12),
+         axis.text.x = element_text(hjust=1, size =12, color = "black"),
+         axis.text.y = element_text(size =12, color = "black"))
 #+end_src
 
 #+RESULTS:
-[[file:R/PLOTS/Latency.png]]
+[[file:R/PLOTS/Latency-paper.pdf]]
 
 **** PingPong - Bandwidth
-#+begin_src R :results output graphics :file R/PLOTS/Bandwidth.png :exports both :width 800 :height 350 :session *R* 
-ggplot(df_intel_band[df_intel_band$interface %in% c("ib", "eth"), ],aes(x=bytes, y=average)) +
-  geom_line(aes(col = interface), alpha = 1) +
-  geom_point(aes(col = interface, shape=interface), size = 4) +
-  scale_shape_manual(values = c(15, 16, 17),
-                     breaks=c("ib", "eth"),
-                     labels=c("InfiniBand FDR 56Gbps", "Ethernet 1Gbps")) +  
-  geom_errorbar(aes(ymin=average-ste, ymax=average+ste, color=interface, group=interface), width = .2) +
-  theme_bw() +
-  scale_y_continuous(breaks=c(0,1,2,3,4,5,6,7,8)) +
-  scale_x_log10(breaks=c(0, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304)) +
-  ylab('Average Bandwidth\n(Gigabytes per Second)') +
-  xlab('Message Size (Bytes)') +
-  scale_colour_manual(values=c( "#BEBEBE", "#303030"),
-                    breaks=c("ib", "eth"),
-                    labels=c("InfiniBand FDR 56Gbps", "Ethernet 1Gbps")) +
-  theme (legend.position = c(0.2, 0.82),
+#+begin_src R :results output graphics :file R/PLOTS/Bandwidth-paper.pdf :exports both :width 4 :height 2.5 :session *R*
+library("scales")
+ggplot(df_intel_band,aes(x=bytes, y=average)) +
+geom_line(aes(col = instance), alpha = 0.5) +
+geom_point(aes(col = instance, shape=instance), size = 2) +
+scale_shape_manual(values = c(15,16,17),
+                     breaks=c("A10", "DS4" ,"F8"),
+                     labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +
+geom_errorbar(aes(ymin=average-ste, ymax=average+ste, color=instance, group=instance), width = .25) +
+theme_bw(base_size=12) +
+scale_y_continuous(breaks=c(0,1,2,3,4,5,6,7,8)) +
+scale_x_log10(breaks=c(1,4,16,64,256,1024,4096,16384,65536,262144,1048576,4194304), labels=trans_format("log2", math_format(2^.x))) +
+ylab('Average Bandwidth(GB/s)') +
+xlab('Message Size (Bytes)') +
+scale_color_manual(values=c( "#ccc210", "#ab6857", "#808585"),
+                     breaks=c("A10", "DS4" ,"F8"),
+                     labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +  
+theme_bw(base_size=13) +  
+ theme (legend.position = c(0.3, 0.7),
          legend.background = element_rect(color = "black", size = 0.3, linetype = "solid"),
-          plot.margin = unit(x = c(0.1, 0, 0, 0), units = "cm"),
-         axis.title=element_text(size=18), 
+         plot.margin = unit(x = c(0, 0, 0, 0), units = "cm"),
+         axis.title=element_text(size=12), 
          legend.title = element_blank(),
-         legend.text = element_text(color = "black", size = 18),
-         axis.text.x = element_text(angle=55, hjust=1, size =16, color = "black"),
-         axis.text.y = element_text(size =16, color = "black"))
-#+end_src
-
-#+RESULTS:
-[[file:R/PLOTS/Bandwidth.png]]
-
-**** FT-EP-IS-SP
-#+begin_src R :results output graphics :file R/PLOTS/FT_EP_IS_SP.png :exports both :width 800 :height 400 :session *R*
-try <- c(exec_ft="FT", exec_sp="SP",  exec_ep="EP", exec_is="IS")
-try2 <- c(exec_ft="128", exec_sp="144",  exec_ep="128", exec_is="128")
-df_apps$interface <- factor(df_apps$interface,
-levels=c("ib", "ipoib", "eth"))
-
-count <- 0
-breaks_fun <- function(x) {
-  count <<- count + 1L
-  switch(
-    count,
-    c(0,10,20,30,40),
-    c(0,400,800,1200,1600),
-    c(0,50,100,150),
-    c(0,200,400,600,800)
-  )
-}
-
-ggplot(df_apps[df_apps$apps %in% c("exec_ft", "exec_sp", "exec_ep", "exec_is"), ] , aes(x=apps, y=average, fill=interface)) +
-geom_bar(stat="identity", position = "dodge", width = 0.6) +
-geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.2, position = position_dodge(.6)) +
-theme_bw() +
-scale_fill_manual(values=c("#303030", "#888888", "#BEBEBE") ,
-breaks=c("ib", "ipoib", "eth"), labels=c("InfiniBand", "IP-over-IB", "Ethernet")) +
-theme(legend.position = "top", 
-      legend.key = element_rect(colour = "grey"),
-      legend.key.height = unit(0.5, "line"),
-      legend.key.width = unit(4, "line"),
-      legend.spacing = unit(100, "line"),
-      plot.margin = unit(x = c(0, 0, 0, 0), units = "cm"),
-      legend.margin=margin(c(0, 0, -8, 0)),
-      axis.text.x = element_text(size =16, color = "black"),
-      axis.text.y = element_text(size =16, color = "black"),
-      axis.title=element_text(size=18), 
-      legend.title = element_blank(),
-      legend.text = element_text(color = "black", size = 18)) +
-      scale_x_discrete(labels=try2) +
-      labs(x="Number of MPI Processes", y="Execution Time in Seconds") +
-      facet_wrap(facets= ~ apps, scales="free", labeller=labeller(apps=try), nrow=1) +
-      scale_y_continuous(breaks = breaks_fun, limits = c(0, NA)) + 
-      theme(strip.text.x=element_text(size=18),
-            strip.background=element_rect(fill='#F5F5F5'))
-     
-#+end_src
-
-#+RESULTS:
-[[file:R/PLOTS/FT_EP_IS_SP.png]]
-
-**** MG-CG-LU-BT
-#+begin_src R :results output graphics :file R/PLOTS/MG_CG_LU_BT.png :exports both :width 800 :height 400 :session *R*
-try <- c(exec_mg="MG", exec_cg="CG",  exec_lu="LU", exec_bt="BT")
-try2 <- c(exec_mg="128", exec_cg="128",  exec_lu="128", exec_bt="144")
-df_apps$interface <- factor(df_apps$interface,
-levels=c("ib", "ipoib", "eth"))
-
-
-count <- 0
-breaks_fun <- function(x) {
-  count <<- count + 1L
-  switch(
-    count,
-    c(0,110,220,330,440,550),
-    c(0,200,400,600,800),
-    c(0,100,200,300),
-    c(0,20,40,60,80)
-  )
-}
-
-ggplot(df_apps[df_apps$apps %in% c("exec_mg", "exec_cg", "exec_lu", "exec_bt"), ] , aes(x=apps, y=average, fill=interface)) +
-geom_bar(stat="identity", position = "dodge", width = 0.6) +
-geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.2, position = position_dodge(.6)) +
-theme_bw() +
-scale_fill_manual(values=c("#303030", "#888888", "#BEBEBE") ,
-breaks=c("ib", "ipoib", "eth"), labels=c("InfiniBand", "IP-over-IB", "Ethernet")) +
-theme(legend.position = "top", 
-      legend.key = element_rect(colour = "grey"),
-      legend.key.height = unit(0.5, "line"),
-      legend.key.width = unit(4, "line"),
-      legend.spacing = unit(100, "line"),
-      plot.margin = unit(x = c(0, 0, 0, 0), units = "cm"),
-      legend.margin=margin(c(0, 0, -8, 0)),
-      axis.text.x = element_text(size =16, color = "black"),
-      axis.text.y = element_text(size =16, color = "black"),
-      axis.title=element_text(size=18), 
-      legend.title = element_blank(),
-      legend.text = element_text(color = "black", size = 18)) +
-      scale_x_discrete(labels=try2) +
-      labs(x="Number of MPI Processes", y="Execution Time in Seconds") +
-      facet_wrap(facets= ~ apps, scales="free", labeller=labeller(apps=try), nrow=1) +
-      scale_y_continuous(breaks = breaks_fun, limits = c(0, NA)) +
-      theme(strip.text.x=element_text(size=18),
-            strip.background=element_rect(fill='#F5F5F5'))
-#+end_src
-
-#+RESULTS:
-[[file:R/PLOTS/MG_CG_LU_BT.png]]
-
-**** Alya-IMB
-#+begin_src R :results output graphics :file R/PLOTS/Alya-IMB.png :exports both :width 800 :height 400 :session *R*  
-try <- c(exec_alya="Alya",exec_imb_memory="ImbBench-Memory\n8Level", exec_imb_CPU="ImbBench-CPU\n8Level")
-try2 <- c(exec_alya="160", exec_imb_memory="160", exec_imb_CPU="160")
-df_apps$interface <- factor(df_apps$interface,
-levels=c("ib", "ipoib", "eth"))
-
-count <- 0
-breaks_fun <- function(x) {
-  count <<- count + 1L
-  switch(
-    count,
-    c(0,100,200,300),
-    c(0,3,6,9),
-    c(0,7,14,21,28)
-  )
-}
-
-ggplot(df_apps[df_apps$apps %in% c("exec_alya", "exec_imb_memory", "exec_imb_CPU"), ] , aes(x=apps, y=average, fill=interface)) +
-geom_bar(stat="identity", position = "dodge", width = 0.4) +
-geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=.1, position = position_dodge(.4)) +
-theme_bw() +
-scale_fill_manual(values=c("#303030", "#888888", "#BEBEBE"),
-breaks=c("ib", "ipoib", "eth"), labels=c("InfiniBand", "IP-over-IB", "Ethernet")) +
-theme(legend.position = "top", 
-      legend.key = element_rect(colour = "grey"),
-      legend.key.height = unit(0.5, "line"),
-      legend.key.width = unit(4, "line"),
-      legend.spacing = unit(100, "line"),
-      plot.margin = unit(x = c(0, 0, 0, 0), units = "cm"),
-      legend.margin=margin(c(0, 0, -8, 0)),
-      axis.text.x = element_text(size =16, color = "black"),
-      axis.text.y = element_text(size =16, color = "black"),
-      axis.title=element_text(size=18), 
-      legend.title = element_blank(),
-      legend.text = element_text(color = "black", size = 18)) +
-      scale_x_discrete(labels=try2) +
-      labs(x="Number of MPI Processes", y="Execution Time in Seconds") +
-      facet_wrap(facets= ~ apps, scales="free", labeller=labeller(apps=try), nrow=1) +
-      scale_y_continuous(breaks = breaks_fun, limits = c(0, NA)) + 
-      theme(strip.text.x=element_text(size=18),
-            strip.background=element_rect(fill='#F5F5F5'))
-
-
+         legend.text = element_text(color = "black", size = 12),
+         axis.text.x = element_text(hjust=1, size =12, color = "black"),
+         axis.text.y = element_text(size =12, color = "black"))
 
 #+end_src
 
 #+RESULTS:
-[[file:R/PLOTS/Alya-IMB.png]]
+[[file:R/PLOTS/Bandwidth-paper.pdf]]
+
+**** Alya
+#+begin_src R :results output graphics :file  R/PLOTS/ALYA.pdf :exports both :width 1.8 :height 4 :session *R* 
+ggplot(df_apps[df_apps$apps %in% c("ALYA"), ], aes(x=apps, y=average, fill=instance)) +
+geom_bar(stat="identity", position = "dodge", width = 1) +
+         geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.5, position = position_dodge(1)) +
+         theme_bw(base_size=12) +
+         scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
+         breaks=c("A10", "DS4", "F8"), labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +  
+      theme(legend.position = "none", 
+       #        legend.key = element_rect(colour = "grey"),
+        #       legend.key.height = unit(0.5, "line"),
+         #      legend.key.width = unit(4, "line"),
+          #     legend.spacing = unit(100, "line"),
+               plot.margin = unit(x = c(0.2, 0.05, 0, 0), units = "cm"),
+               legend.margin=margin(c(0, 0, -8, 0)),
+               axis.text.x = element_text(size =16, color = "black"),
+               axis.text.y = element_text(size =16, color = "black"),
+               axis.title=element_text(size=16), 
+               legend.title = element_blank(),
+               legend.text = element_text(color = "black", size = 16)) +
+         labs(y="Execution Time in Seconds",
+              x=element_blank())
+#+end_src
+
+#+RESULTS:
+[[file:R/PLOTS/ALYA.pdf]]
+
+**** BT
+#+begin_src R :results output graphics :file  R/PLOTS/BT.pdf :exports both :width 1.8 :height 4 :session *R* 
+ggplot(df_apps[df_apps$apps %in% c("BT"), ], aes(x=apps, y=average, fill=instance)) +
+geom_bar(stat="identity", position = "dodge", width = 1) +
+         geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.5, position = position_dodge(1)) +
+         theme_bw(base_size=12) +
+         scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
+         breaks=c("A10", "DS4", "F8"), labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +  
+      theme(legend.position = "none", 
+       #        legend.key = element_rect(colour = "grey"),
+        #       legend.key.height = unit(0.5, "line"),
+         #      legend.key.width = unit(4, "line"),
+          #     legend.spacing = unit(100, "line"),
+               plot.margin = unit(x = c(0.2, 0.05, 0, 0), units = "cm"),
+               legend.margin=margin(c(0, 0, -8, 0)),
+               axis.text.x = element_text(size =16, color = "black"),
+               axis.text.y = element_text(size =16, color = "black"),
+               axis.title=element_text(size=16), 
+               legend.title = element_blank(),
+               legend.text = element_text(color = "black", size = 16)) +
+         labs(y=element_blank(),
+              x=element_blank())
+#+end_src
+
+#+RESULTS:
+[[file:R/PLOTS/BT.pdf]]
+
+**** CG
+#+begin_src R :results output graphics :file  R/PLOTS/CG.pdf :exports both :width 1.8 :height 4 :session *R* 
+ggplot(df_apps[df_apps$apps %in% c("CG"), ], aes(x=apps, y=average, fill=instance)) +
+geom_bar(stat="identity", position = "dodge", width = 1) +
+         geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.5, position = position_dodge(1)) +
+         theme_bw(base_size=12) +
+         scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
+         breaks=c("A10", "DS4", "F8"), labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +  
+      theme(legend.position = "none", 
+       #        legend.key = element_rect(colour = "grey"),
+        #       legend.key.height = unit(0.5, "line"),
+         #      legend.key.width = unit(4, "line"),
+          #     legend.spacing = unit(100, "line"),
+               plot.margin = unit(x = c(0.2, 0.05, 0, 0), units = "cm"),
+               legend.margin=margin(c(0, 0, -8, 0)),
+               axis.text.x = element_text(size =16, color = "black"),
+               axis.text.y = element_text(size =16, color = "black"),
+               axis.title=element_text(size=16), 
+               legend.title = element_blank(),
+               legend.text = element_text(color = "black", size = 16)) +
+         labs(y=element_blank(),
+              x=element_blank())
+#+end_src
+
+#+RESULTS:
+[[file:R/PLOTS/CG.pdf]]
+
+**** EP
+#+begin_src R :results output graphics :file  R/PLOTS/EP.pdf :exports both :width 1.8 :height 4 :session *R* 
+ggplot(df_apps[df_apps$apps %in% c("EP"), ], aes(x=apps, y=average, fill=instance)) +
+geom_bar(stat="identity", position = "dodge", width = 1) +
+         geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.5, position = position_dodge(1)) +
+         theme_bw(base_size=12) +
+         scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
+         breaks=c("A10", "DS4", "F8"), labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +  
+      theme(legend.position = "none", 
+       #        legend.key = element_rect(colour = "grey"),
+        #       legend.key.height = unit(0.5, "line"),
+         #      legend.key.width = unit(4, "line"),
+          #     legend.spacing = unit(100, "line"),
+               plot.margin = unit(x = c(0.2, 0.05, 0, 0), units = "cm"),
+               legend.margin=margin(c(0, 0, -8, 0)),
+               axis.text.x = element_text(size =16, color = "black"),
+               axis.text.y = element_text(size =16, color = "black"),
+               axis.title=element_text(size=16), 
+               legend.title = element_blank(),
+               legend.text = element_text(color = "black", size = 16)) +
+         labs(y=element_blank(),
+              x=element_blank())
+#+end_src
+
+#+RESULTS:
+[[file:R/PLOTS/EP.pdf]]
+
+**** FT
+#+begin_src R :results output graphics :file  R/PLOTS/FT.pdf :exports both :width 1.8 :height 4 :session *R* 
+ggplot(df_apps[df_apps$apps %in% c("FT"), ], aes(x=apps, y=average, fill=instance)) +
+geom_bar(stat="identity", position = "dodge", width = 1.1) +
+         geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.6, position = position_dodge(1.1)) +
+         theme_bw(base_size=12) +
+         scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
+         breaks=c("A10", "DS4", "F8"), labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +  
+      theme(legend.position = "none", 
+       #        legend.key = element_rect(colour = "grey"),
+        #       legend.key.height = unit(0.5, "line"),
+         #      legend.key.width = unit(4, "line"),
+          #     legend.spacing = unit(100, "line"),
+               plot.margin = unit(x = c(0.2, 0.05, 0, 0), units = "cm"),
+               legend.margin=margin(c(0, 0, -4, 0)),
+               axis.text.x = element_text(size =16, color = "black"),
+               axis.text.y = element_text(size =16, color = "black"),
+               axis.title=element_text(size=16), 
+               legend.title = element_blank(),
+               legend.text = element_text(color = "black", size = 14)) +
+         labs(y=element_blank(),
+              x=element_blank())
+#+end_src
+
+
+#+RESULTS:
+[[file:R/PLOTS/FT.pdf]]
+
+**** IS
+#+begin_src R :results output graphics :file  R/PLOTS/IS.pdf :exports both :width 1.8 :height 4 :session *R* 
+ggplot(df_apps[df_apps$apps %in% c("IS"), ], aes(x=apps, y=average, fill=instance)) +
+geom_bar(stat="identity", position = "dodge", width = 1) +
+         geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.5, position = position_dodge(1)) +
+         theme_bw(base_size=12) +
+         scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
+         breaks=c("A10", "DS4", "F8"), labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +  
+      theme(legend.position = "none", 
+       #        legend.key = element_rect(colour = "grey"),
+        #       legend.key.height = unit(0.5, "line"),
+         #      legend.key.width = unit(4, "line"),
+          #     legend.spacing = unit(100, "line"),
+               plot.margin = unit(x = c(0.2, 0.05, 0, 0), units = "cm"),
+               legend.margin=margin(c(0, 0, -8, 0)),
+               axis.text.x = element_text(size =16, color = "black"),
+               axis.text.y = element_text(size =16, color = "black"),
+               axis.title=element_text(size=16), 
+               legend.title = element_blank(),
+               legend.text = element_text(color = "black", size = 16)) +
+         labs(y=element_blank(),
+              x=element_blank())
+#+end_src
+
+#+RESULTS:
+[[file:R/PLOTS/IS.pdf]]
+
+**** LU
+#+begin_src R :results output graphics :file  R/PLOTS/LU.pdf :exports both :width 1.8 :height 4 :session *R* 
+ggplot(df_apps[df_apps$apps %in% c("LU"), ], aes(x=apps, y=average, fill=instance)) +
+geom_bar(stat="identity", position = "dodge", width = 1) +
+         geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.5, position = position_dodge(1)) +
+         theme_bw(base_size=12) +
+         scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
+         breaks=c("A10", "DS4", "F8"), labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +  
+      theme(legend.position = "none", 
+       #        legend.key = element_rect(colour = "grey"),
+        #       legend.key.height = unit(0.5, "line"),
+         #      legend.key.width = unit(4, "line"),
+          #     legend.spacing = unit(100, "line"),
+               plot.margin = unit(x = c(0.2, 0.05, 0, 0), units = "cm"),
+               legend.margin=margin(c(0, 0, -8, 0)),
+               axis.text.x = element_text(size =16, color = "black"),
+               axis.text.y = element_text(size =16, color = "black"),
+               axis.title=element_text(size=16), 
+               legend.title = element_blank(),
+            legend.text = element_text(color = "black", size = 16)) +
+         labs(y=element_blank(),
+              x=element_blank())
+#+end_src
+
+#+RESULTS:
+[[file:R/PLOTS/LU.pdf]]
+
+**** SP
+#+begin_src R :results output graphics :file  R/PLOTS/SP.pdf :exports both :width 1.8 :height 4 :session *R* 
+ggplot(df_apps[df_apps$apps %in% c("SP"), ], aes(x=apps, y=average, fill=instance)) +
+geom_bar(stat="identity", position = "dodge", width = 1.1) +
+         geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.6, position = position_dodge(1.1)) +
+         theme_bw(base_size=12) +
+         scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
+         breaks=c("A10", "DS4", "F8"), labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +  
+      theme(legend.position = "none", 
+       #        legend.key = element_rect(colour = "grey"),
+        #       legend.key.height = unit(0.5, "line"),
+         #      legend.key.width = unit(4, "line"),
+          #     legend.spacing = unit(100, "line"),
+               plot.margin = unit(x = c(0.2, 0.05, 0, 0), units = "cm"),
+               legend.margin=margin(c(0, 0, -8, 0)),
+               axis.text.x = element_text(size =16, color = "black"),
+               axis.text.y = element_text(size =16, color = "black"),
+               axis.title=element_text(size=16), 
+               legend.title = element_blank(),
+               legend.text = element_text(color = "black", size = 16)) +
+         labs(y=element_blank(),
+              x=element_blank())
+#+end_src
+
+#+RESULTS:
+[[file:R/PLOTS/SP.pdf]]
+
+**** MG
+#+begin_src R :results output graphics :file  R/PLOTS/MG.pdf :exports both :width 1.8 :height 4 :session *R* 
+ggplot(df_apps[df_apps$apps %in% c("MG"), ], aes(x=apps, y=average, fill=instance)) +
+geom_bar(stat="identity", position = "dodge", width = 1) +
+         geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.5, position = position_dodge(1)) +
+         theme_bw(base_size=12) +
+         scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
+         breaks=c("A10", "DS4", "F8"), labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +  
+      theme(legend.position = "none", 
+       #        legend.key = element_rect(colour = "grey"),
+        #       legend.key.height = unit(0.5, "line"),
+         #      legend.key.width = unit(4, "line"),
+          #     legend.spacing = unit(100, "line"),
+               plot.margin = unit(x = c(0.2, 0.05, 0, 0), units = "cm"),
+               legend.margin=margin(c(0, 0, -8, 0)),
+               axis.text.x = element_text(size =16, color = "black"),
+               axis.text.y = element_text(size =16, color = "black"),
+               axis.title=element_text(size=16), 
+               legend.title = element_blank(),
+               legend.text = element_text(color = "black", size = 16)) +
+         labs(y=element_blank(),
+              x=element_blank())
+#+end_src
+
+#+RESULTS:
+[[file:R/PLOTS/MG.pdf]]
+**** Legend
+#+begin_src R :results output graphics :file  R/PLOTS/Legend.pdf :exports both :width 1.8 :height 4 :session *R* 
+options(crayon.enabled=FALSE)
+suppressMessages(library("ggplot2"));
+suppressMessages(library("grid"));
+suppressMessages(library("gridExtra"));
+my_hist <- ggplot(df_apps[df_apps$apps %in% c("MG"), ], aes(apps, fill=instance)) +
+geom_bar()
+theme(legend.position = "top",
+legend <- cowplot::get_legend(my_hist),
+grid.newpage(),
+grid.draw(legend)) 
+#+end_src
+
+#+RESULTS:
+[[file:R/PLOTS/Legend.pdf]]
+**** Legend1
+#+begin_src R :results output graphics :file  R/PLOTS/Legend1.pdf :exports both :width 6 :height 4 :session *R* 
+ggplot(df_apps[df_apps$apps %in% c("MG"), ], aes(x=apps, y=average, fill=instance)) +
+geom_bar(stat="identity", position = "dodge", width = 1) +
+         geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.5, position = position_dodge(1)) +
+         theme_bw(base_size=12) +
+         scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
+         breaks=c("A10", "DS4", "F8"), labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +  
+      theme(legend.position = "top", 
+       #        legend.key = element_rect(colour = "grey"),
+        #       legend.key.height = unit(0.5, "line"),
+         #      legend.key.width = unit(4, "line"),
+          #     legend.spacing = unit(100, "line"),
+               plot.margin = unit(x = c(0.2, 0.05, 0, 0), units = "cm"),
+               legend.margin=margin(c(0, 0, -8, 0)),
+               axis.text.x = element_text(size =16, color = "black"),
+               axis.text.y = element_text(size =16, color = "black"),
+               axis.title=element_text(size=16), 
+               legend.title = element_blank(),
+               legend.text = element_text(color = "black", size = 16)) +
+         labs(y=element_blank(),
+              x=element_blank())
+#+end_src
+
+#+RESULTS:
+[[file:R/PLOTS/Legend1.pdf]]
+
+
 *** Cost Plots
 **** Read CSVs 
 #+begin_src R :results output :session *R* :exports both
