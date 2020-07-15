@@ -35,20 +35,14 @@ INTEL_SOURCE=$INTEL/src_cpp/Makefile
 APP_BIN_INTEL=$INTEL/IMB-MPI1
 APP_TEST_INTEL=PingPong
 
-#Environment
-if [[ ${HOSTNAME:0:3} == A10 ]]; then
-	instance=A10
-else 
-	instance=A8
-fi
+	instance=F8
 
 #Other Variables
 START=`date +"%d-%m-%Y.%Hh%Mm%Ss"`
 OUTPUT_APPS_EXEC=$LOGS_CSV/exec_$instance.$START.csv
 OUTPUT_INTEL_EXEC=$LOGS_CSV/intel_$instance.$START.csv
 CONTROL_FILE_OUTPUT=$BASE/LOGS/SYS_INFO/env_info_$instance.org
-PARTITION=(${instance}ISCC1 ${instance}ISCC2 ${instance}ISCC3 ${instance}ISCC4 
-	${instance}ISCC5 ${instance}ISCC6 ${instance}ISCC7 ${instance}ISCC8)
+PARTITION=(isccf8ulz000000 isccf8ulz000002 isccf8ulz000003 isccf8ulz000004 isccf8ulz000005 isccf8ulz000006 isccf8ulz000008 isccf8ulz000009)
 
 #############################################################################################################
 #######################Step 2: Create the Folders/Download and Compile the Programs##########################
@@ -133,7 +127,6 @@ cd $BASE
 #############################################################################################################
 
 #Define the machine file and Experimental Project
-Rscript $DoE
 MACHINEFILE=$MACHINE_FILE/nodes_$instance
 MACHINEFILE_INTEL=$MACHINE_FILE/nodes_intel_$instance
 PROJECT=$MACHINE_FILE/experimental_project.csv
@@ -158,12 +151,7 @@ do
 	runline+="mpiexec --mca btl self,"
 	
 #Select interface
-	if [[ $instance == A10 ]]; then
 		runline+="tcp --mca btl_tcp_if_include eth0 "
-	else
-		runline+="openib --mca btl_openib_if_include mlx5_0:1 "	
-	fi
-
 #Select app
 	if [[ $apps == intel ]]; then
 		PROCS=2
