@@ -356,7 +356,7 @@ cols(
 # … with 59 more rows
 #+end_example
 **** PingPong - Latency
-#+begin_src R :results output graphics :file R/PLOTS/Latency-presetantion.png :exports both :width 4 :height 2.5 :session *R*  
+#+begin_src R :results output graphics :file R/PLOTS/Latency-paper.pdf :exports both :width 4 :height 2.5 :session *R*  
 library("scales")
 ggplot(df_intel_latency,aes(x=bytes, y=average)) +
 geom_line(aes(color = instance), alpha = 0.5) +
