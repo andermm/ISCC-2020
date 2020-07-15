@@ -197,13 +197,13 @@ step is to read the CSV files.
 #+begin_src R :results output :session *R* :exports both
 options(crayon.enabled=FALSE)
 suppressMessages(library("tidyverse"));
-df_intel_A10 <- read_csv("LOGS/LOGS_CSV/intel_A10.11-02-2020.12h02m47s.csv", progress=FALSE)
-df_intel_F8 <- read_csv("LOGS/LOGS_CSV/intel_F8.29-02-2020.00h21m11s.csv", progress=FALSE)
-df_intel_DS4 <- read_csv("LOGS/LOGS_CSV/intel_DS4.28-02-2020.23h37m39s.csv", progress=FALSE)
+df_intel_A10 <- read_csv("LOGS/intel_A10.11-02-2020.12h02m47s.csv", progress=FALSE)
+df_intel_F8 <- read_csv("LOGS/intel_F8.29-02-2020.00h21m11s.csv", progress=FALSE)
+df_intel_DS4 <- read_csv("LOGS/intel_DS4.28-02-2020.23h37m39s.csv", progress=FALSE)
 df_intel=bind_rows(df_intel_A10,df_intel_F8,df_intel_DS4)
-df_apps_A10 <- read_csv("LOGS/LOGS_CSV/exec_A10.11-02-2020.12h02m47s.csv", progress=FALSE)
-df_apps_F8 <- read_csv("LOGS/LOGS_CSV/exec_F8.29-02-2020.00h21m11s.csv", progress=FALSE)
-df_apps_DS4 <- read_csv("LOGS/LOGS_CSV/exec_DS4.28-02-2020.23h37m39s.csv", progress=FALSE)
+df_apps_A10 <- read_csv("LOGS/exec_A10.11-02-2020.12h02m47s.csv", progress=FALSE)
+df_apps_F8 <- read_csv("LOGS/exec_F8.29-02-2020.00h21m11s.csv", progress=FALSE)
+df_apps_DS4 <- read_csv("LOGS/exec_DS4.28-02-2020.23h37m39s.csv", progress=FALSE)
 df_apps=bind_rows(df_apps_A10,df_apps_F8,df_apps_DS4)
 df_apps$apps=toupper(df_apps$apps)
 
@@ -356,15 +356,15 @@ cols(
 # … with 59 more rows
 #+end_example
 **** PingPong - Latency
-#+begin_src R :results output graphics :file R/PLOTS/Latency-presetantion.png :exports both :width 800 :height 350 :session *R*  
+#+begin_src R :results output graphics :file R/PLOTS/Latency-presetantion.png :exports both :width 4 :height 2.5 :session *R*  
 library("scales")
 ggplot(df_intel_latency,aes(x=bytes, y=average)) +
-geom_line(aes(color = instance), alpha = 1) +
-  geom_point(aes(color=instance, shape=instance),size = 4) +
+geom_line(aes(color = instance), alpha = 0.5) +
+  geom_point(aes(color=instance, shape=instance),size = 2) +
   scale_shape_manual(values = c(15,16,17),
                      breaks=c("A10", "DS4" ,"F8"),
                      labels=c("A10-10GbE","DS4_v2-40GbE IB" ,"F8-50GbE IB")) +
-  geom_errorbar(aes(ymin=average-ste, ymax=average+ste, color=instance, group=instance), width = .2) +
+  geom_errorbar(aes(ymin=average-ste, ymax=average+ste, color=instance, group=instance), width = .25) +
   theme_bw(base_size=12) +
   scale_y_log10(breaks=c(1,4,16,64,256,1024), labels=trans_format("log2", math_format(2^.x))) +
   scale_x_log10(breaks=c(1,4,16,64,256,1024,4096,16384,65536,262144,1048576,4194304), labels=trans_format("log2", math_format(2^.x))) +
@@ -373,16 +373,16 @@ geom_line(aes(color = instance), alpha = 1) +
   scale_color_manual(values=c( "#ccc210", "#ab6857", "#808585"),
                      breaks=c("A10", "DS4" ,"F8"),
                      labels=c("A10-10GbE","DS4_v2-40GbE IB" ,"F8-50GbE IB")) +
-  theme_bw(base_size = 12) +
-  theme (legend.position = c(0.15, 0.85),
+  theme_bw(base_size = 13) +
+  theme (legend.position = c(0.3, 0.7),
          legend.background = element_rect(color = "black", size = 0.3, linetype = "solid"),
          plot.margin = unit(x = c(0, 0, 0, 0), units = "cm"),
-         axis.title=element_text(size=18),
+         axis.title=element_text(size=10),
          legend.box.spacing = unit(0, "pt"), 
          legend.title = element_blank(),
-         legend.text = element_text(color = "black", size = 18),
-         axis.text.x = element_text(hjust=1, size =16, color = "black"),
-         axis.text.y = element_text(size =16, color = "black"))
+         legend.text = element_text(color = "black", size = 10),
+         axis.text.x = element_text(hjust=1, size =10, color = "black"),
+         axis.text.y = element_text(size =10, color = "black"))
 #+end_src
 
 #+RESULTS:
