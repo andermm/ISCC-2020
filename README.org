@@ -30,17 +30,15 @@ experiments are in [[LabBook.org]].
 - [[MACHINE_FILES][MACHINE_FILES]] - In this folder are the machine files, two of them
   for each instance size used by the MPI execution line.
 - [[SH]] - Here are the bash scripts ([[SH/experiments_exec.sh][experiments_exec]], [[SH/central.sh][central]],
-  [[SH/clean_folders_files.sh][clean_folder_files]], [[SH/software_install.sh][software_install]], and [[SH/sys_info_collect.sh][sys_info_collect]]) that are
+  [[SH/clean_folders_files.sh][clean_folder_files]], and [[SH/sys_info_collect.sh][sys_info_collect]]) that are
   used to perform the experiments and collect system information.
 
 * Analysis Environment 
 Some specific softwares are required to reproduce this evaluation
 accurately. They are Emacs and Org, both used as project management
 tools to track, record all information, and generate graphics using R
-code blocks. A complete tutorial on how to install and configure the
-mentioned softwares is available [[https://app-learninglab.inria.fr/gitlab/learning-lab/mooc-rr-ressources/blob/master/module2/ressources/emacs_orgmode.org][here]]. If you do not want to use this
-softwares, you can copy the blocks of code and use R or RStudio to
-generate the graphics.
+code blocks. If you do not want to use this softwares, you can copy
+the blocks of code and use R or RStudio to generate the graphics.
  
 * References
 + R. Jain, [[http://www.cs.wustl.edu/~jain/books/perfbook.htm][The Art of Computer Systems Performance Analysis:
