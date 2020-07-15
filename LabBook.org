@@ -188,15 +188,6 @@ The following object is masked from ‘package:base’:
 creating full factorial with 30 runs ...
 #+end_example
 
-** Experiments Execution
-The scripts in this work are designed for use in a cluster with Slurm
-job scheduler. Here, to start the experiments, the [[SH/central.sh][central script]] was
-first executed, which allocates the necessary nodes, in this case,
-hype2, hype3, hype4, and hype5, and passes through ssh the bash
-command that calls the [[SH//experiments_exec.sh][experiments execution]] script. This script first
-calls the [[SH/sys_info_collect.sh][system information]] script to collect system
-information.
-
 ** Graphical Analysis
 Upon completion of the experiments, in this topic, graphs containing
 the execution time and network performance were created. The first
