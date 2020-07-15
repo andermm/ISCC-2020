@@ -386,7 +386,7 @@ geom_line(aes(color = instance), alpha = 0.5) +
 #+end_src
 
 #+RESULTS:
-[[file:R/PLOTS/Latency-presetantion.png]]
+[[file:R/PLOTS/Latency-paper.pdf]]
 
 **** PingPong - Bandwidth
 #+begin_src R :results output graphics :file R/PLOTS/Bandwidth-paper.pdf :exports both :width 4 :height 2.5 :session *R*
