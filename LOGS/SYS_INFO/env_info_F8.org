@@ -1,6 +1,0 @@
-#+TITLE: System Information
-#+DATE: Sat Feb 29 00:21:11 UTC 2020
-#+AUTHOR: iscc
-#+MACHINE: isccf8ulz000000
-#+FILE: env_info_F8.org
-
