@@ -20,20 +20,14 @@ experiments are in [[LabBook.org]].
 #+END_QUOTE
 
 * Folders and Files Description
-- [[BENCHMARKS]] - This folder has all the benchmarks (Alya, Intel MPI
-  Benchmarks and NAS Parallel Benchmarks).
 - [[LabBook.org]] - In this file is described the entire experimental
   project, with the objective, benchmarks, how to reproduce it,
   software installation, system information, network information,
   design of experiments, bash script description, experiments
   execution, and finally the graphical analysis.
 - [[LOGS]] - This folder has the benchmark execution logs in CSV files
-  (~apps_exec~ and ~intel~), a file containing the [[LOGS/env_info.org][environment information]]
-  used in the experiments, a folder called [[LOGS/LOGS_BACKUP][LOGS_BACKUP]] that includes
-  the application logs without any modification, a folder called
-  [[LOGS/LOGS_BACKUP_SRC_ODE][LOGS_BACKUP_SRC_CODE]] that has the source code of the benchmarks, and a
-  folder called [[LOGS/LOGS_DOWNLOAD][LOGS_DOWNLOAD]] with the software download logs.
-- [[SH/MACHINE_FILES][MACHINE_FILES]] - In this folder are the two machine files ([[LOGS/nodes][nodes]] and
+  (~exec_$INTANCE_NAME~ and ~intel_$INSTANCE_NAME~).
+- [[MACHINE_FILES][MACHINE_FILES]] - In this folder are the two machine files ([[LOGS/nodes][nodes]] and
   [[LOGS/nodes_intel][nodes_intel]] used by the MPI execution line.
 - [[SH]] - Here are the bash scripts ([[SH/experiments_exec.sh][experiments_exec]], [[SH/central.sh][central]],
   [[SH/clean_folders_files.sh][clean_folder_files]], [[SH/software_install.sh][software_install]], and [[SH/sys_info_collect.sh][sys_info_collect]]) that are
