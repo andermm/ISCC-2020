@@ -26,9 +26,9 @@ experiments are in [[LabBook.org]].
   design of experiments, bash script description, experiments
   execution, and finally the graphical analysis.
 - [[LOGS]] - This folder has the benchmark execution logs in CSV files
-  (~exec_$INTANCE_NAME~ and ~intel_$INSTANCE_NAME~).
-- [[MACHINE_FILES][MACHINE_FILES]] - In this folder are the two machine files ([[LOGS/nodes][nodes]] and
-  [[LOGS/nodes_intel][nodes_intel]] used by the MPI execution line.
+  (~exec_$INSTANCE_NAME~ and ~intel_$INSTANCE_NAME~).
+- [[MACHINE_FILES][MACHINE_FILES]] - In this folder are the machine files, two of them
+  for each instance size used by the MPI execution line.
 - [[SH]] - Here are the bash scripts ([[SH/experiments_exec.sh][experiments_exec]], [[SH/central.sh][central]],
   [[SH/clean_folders_files.sh][clean_folder_files]], [[SH/software_install.sh][software_install]], and [[SH/sys_info_collect.sh][sys_info_collect]]) that are
   used to perform the experiments and collect system information.
