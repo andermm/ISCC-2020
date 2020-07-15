@@ -126,13 +126,6 @@ be installed. They are:
   ~salloc~ command from Slurm Workload Manager and then pass the bash
   script execution command through ssh to start the Experiments
   Execution.
-- [[SH/software_install.sh][Software Installation]] - This script is basically a simple loop to
-  check whether packages within the 'name' vector are installed or
-  not. If so, them ok. Otherwise, install the packages that are not
-  installed. This script assume that the user has sudo
-  privilegies. Otherwise, go to the *Software Installation* session,
-  which will describe how to install the software using Spack packet
-  manager.
 - [[SH/sys_info_collect.sh][System Information Collect]] - This is a crucial script to performance
   evaluations, which is executed before the benchmarks. It saves all the
   system information and sends the output to an ORG file. This output
