@@ -21,10 +21,8 @@ reproduce this evaluation, you can follow the steps below. Have fun!
 * Experimental Project
 ** Objective
    Assess the impact of the network interconnection on HPC
-   applications regarding performance and cost-effiency. Two different
-   instances sizes (A8 and A10) from Microsoft Azure with same
-   physical hardware, but different interconnections (InfiniBand (IB)
-   and 10 GbE were evaluated were used. The MPI-PingPong benchmark of
+   applications regarding performance and cost-effiency. Three different
+   instances sizes (A10, F8, and DS4_v2) were used. The MPI-PingPong benchmark of
    the [[https://software.intel.com/en-us/articles/intel-mpi-benchmarks][Intel MPI Benchmarks]] suite was executed to first characterize
    the interconnection latency and bandwidth. Then we executed the NPB
    set of synthetic benchmarks and one real application (Alya). [[https://www.nas.nasa.gov/publications/npb.html][NAS
@@ -72,11 +70,6 @@ Three pseudo-applications:
 - *SP* - Scalar Penta-diagonal solver.
 - *LU* - Lower-Upper Gauss-Seidel solver.
 
-They were executed with 128 processes on 4 nodes, 32 processes per
-node, in the case of IS, EP, CG, FT, MG, and LU (power-of-two). Since
-BT and SP require that the number of processes to be a square root,
-144 processes were used, with 36 processes in each node.
-
 *** Alya
 Alya is a high performance computational mechanics code to solve
 complex coupled multi-physics / multi-scale / multi-domain problems,
@@ -86,23 +79,6 @@ incompressible/compressible flows, non-linear solid mechanics,
 chemistry, particle transport, heat transfer, turbulence modeling,
 electrical propagation, etc.
 
-** How to Reproduce it
-To reproduce this project, the first step is to to clone the git repository in
-the *$HOME* of the desired cluster of servers. 
-
-#+begin_src shell :results output :exports both
-cd $HOME; git clone https://github.com/andermm/CMP223
-#+end_src
-
-Then executes the [[SH/clean_folders_files.sh][clean bash script]] to clean the results and all
-obtained data from this evaluation.
-
-#+begin_src shell :results output :exports both
-cd $HOME/ISCC-2020/SH; ./clean_folders_files.sh 
-#+end_src
-
-then...
-
 ** Required Softwares
 To execute the experiments, some required packages need to
 be installed. They are:
@@ -111,19 +87,11 @@ be installed. They are:
   mpifort).
 - gfortran - GNU Fortran 95 compiler.
 
-If your OS is Debian based and you have permission to install new
-packages, you can install the required packages using the [[SH/software_install.sh][Software
-Installer]] script. On the other hand, if you do not have permission to
-do so, you can use the Spack package manager. The full tutorial on how
-to use Spack can be seen [[https://spack-tutorial.readthedocs.io/en/latest/][here]].
-
 ** System Information 
    To collect the information of all nodes used in the evaluation, it
-   was used the [[SH/sys_info_collect.sh][System Information Collect]] script, which creates the
-   a [[LOGS/env_info.org][System Information]] log output with ORG extension. The script
-   executes automatically in the execution script.
+   was used the [[SH/sys_info_collect.sh][System Information Collect]] script. The script executes
+   automatically in the execution script.
 
-** Network Infrastructure Information
 ** Bash Scripts Descriptions
 - [[SH/experiments_exec.sh][Experiments Execution]] - This is the most essential script for this
   evaluation. It comprises from the beginning, when the variables are
@@ -154,14 +122,6 @@ to use Spack can be seen [[https://spack-tutorial.readthedocs.io/en/latest/][her
     the execution trace process records all the MPI primitives in a
     file and therefore can interfer in the normal execution
     considering resources usage (e.g., IO).
-- [[SH/experiments_charac.sh][Experiments Characterization]] - This script is similar to the one
-  discribed above, however, it only performs the experiment
-  characterization, subdivided into three steps, which are:
-
-  - *Step 1*: A first definition of the variables.
-  - *Step 2*: Definition of the Machines Files and Experimental Project.
-  - *Step 3*: Read the Experimental Project and Start the Execution Loop
-
 - [[SH/central.sh][Central]] - This script was created to allocate the nodes using the
   ~salloc~ command from Slurm Workload Manager and then pass the bash
   script execution command through ssh to start the Experiments
@@ -190,7 +150,7 @@ set.seed(0)
 ISCC2020 <- fac.design(factor.names = list(
   apps = c("bt", "ep", "cg", "mg", "lu",
            "sp", "is", "ft", "intel", "alya"),
-  instance = c("A8", "A10")),
+  instance = c("F8", "A10", "DS4")),
   replications=30,
   randomize=TRUE)
 
@@ -232,7 +192,7 @@ The following object is masked from ‘package:base’:
 ✖ dplyr::filter() masks stats::filter()
 ✖ dplyr::lag()    masks stats::lag()
 
-creating full factorial with 20 runs ...
+creating full factorial with 30 runs ...
 #+end_example
 
 ** Experiments Execution
@@ -242,20 +202,7 @@ first executed, which allocates the necessary nodes, in this case,
 hype2, hype3, hype4, and hype5, and passes through ssh the bash
 command that calls the [[SH//experiments_exec.sh][experiments execution]] script. This script first
 calls the [[SH/sys_info_collect.sh][system information]] script to collect system
-information. Next, it executes the experiments and, at the end,
-requests that the [[SH/experiments_charac.sh][experiments characterization]] script to start the
-characterization execution.
-
-To reproduce this evaluation in an environment without Slurm job
-scheduler, simply clone this repository into the server's HOME
-directory, set the server names in the PARTITION variable ([[SH/experiments_exec.sh][experiments
-execution]] script line 66), adjust the machine files in [[MACHINE_FILES][Machine Files]]
-folder also with the name of the servers, adjust the number of
-processes (in [[SH/experiments_exec.sh][experiments execution]] script lines 237, 240, 243 and,
-246 and in [[SH/experiments_charac.sh][experiments characterization]] script lines 93, 96 and, 99)
-to be used during the execution, respecting the power of two or square
-root requirements, and finally executes the [[SH/experiments_exec.sh][experiments execution]]
-script like a normal bash script.
+information.
 
 ** Graphical Analysis
 Upon completion of the experiments, in this topic, graphs containing
@@ -425,37 +372,37 @@ cols(
 # … with 59 more rows
 #+end_example
 **** PingPong - Latency
-#+begin_src R :results output graphics :file R/PLOTS/Latency-paper.pdf :exports both :width 4 :height 2.5 :session *R*  
+#+begin_src R :results output graphics :file R/PLOTS/Latency-presetantion.png :exports both :width 800 :height 350 :session *R*  
 library("scales")
 ggplot(df_intel_latency,aes(x=bytes, y=average)) +
-  geom_line(aes(color = instance), alpha = 0.5) +
-  geom_point(aes(color=instance, shape=instance),size = 2) +
+geom_line(aes(color = instance), alpha = 1) +
+  geom_point(aes(color=instance, shape=instance),size = 4) +
   scale_shape_manual(values = c(15,16,17),
                      breaks=c("A10", "DS4" ,"F8"),
-                     labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +
-  geom_errorbar(aes(ymin=average-ste, ymax=average+ste, color=instance, group=instance), width = .25) +
+                     labels=c("A10-10GbE","DS4_v2-40GbE IB" ,"F8-50GbE IB")) +
+  geom_errorbar(aes(ymin=average-ste, ymax=average+ste, color=instance, group=instance), width = .2) +
   theme_bw(base_size=12) +
   scale_y_log10(breaks=c(1,4,16,64,256,1024), labels=trans_format("log2", math_format(2^.x))) +
   scale_x_log10(breaks=c(1,4,16,64,256,1024,4096,16384,65536,262144,1048576,4194304), labels=trans_format("log2", math_format(2^.x))) +
   ylab(expression(paste("Average Latency Time (",mu,"s)"))) +
-  xlab('Message Size (Bytes)') +
+    xlab('Message Size (Bytes)') +
   scale_color_manual(values=c( "#ccc210", "#ab6857", "#808585"),
                      breaks=c("A10", "DS4" ,"F8"),
-                     labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +
+                     labels=c("A10-10GbE","DS4_v2-40GbE IB" ,"F8-50GbE IB")) +
   theme_bw(base_size = 12) +
-  theme (legend.position = c(0.3, 0.7),
+  theme (legend.position = c(0.15, 0.85),
          legend.background = element_rect(color = "black", size = 0.3, linetype = "solid"),
          plot.margin = unit(x = c(0, 0, 0, 0), units = "cm"),
-         axis.title=element_text(size=10),
+         axis.title=element_text(size=18),
          legend.box.spacing = unit(0, "pt"), 
          legend.title = element_blank(),
-         legend.text = element_text(color = "black", size = 10),
-         axis.text.x = element_text(hjust=1, size =10, color = "black"),
-         axis.text.y = element_text(size =10, color = "black"))
+         legend.text = element_text(color = "black", size = 18),
+         axis.text.x = element_text(hjust=1, size =16, color = "black"),
+         axis.text.y = element_text(size =16, color = "black"))
 #+end_src
 
 #+RESULTS:
-[[file:R/PLOTS/Latency-paper.pdf]]
+[[file:R/PLOTS/Latency-presetantion.png]]
 
 **** PingPong - Bandwidth
 #+begin_src R :results output graphics :file R/PLOTS/Bandwidth-paper.pdf :exports both :width 4 :height 2.5 :session *R*
@@ -465,16 +412,16 @@ geom_line(aes(col = instance), alpha = 0.5) +
 geom_point(aes(col = instance, shape=instance), size = 2) +
 scale_shape_manual(values = c(15,16,17),
                      breaks=c("A10", "DS4" ,"F8"),
-                     labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +
+                     labels=c("A10-10GbE","DS4_v2-40GbE IB" ,"F8-50GbE IB")) +
 geom_errorbar(aes(ymin=average-ste, ymax=average+ste, color=instance, group=instance), width = .25) +
 theme_bw(base_size=12) +
 scale_y_continuous(breaks=c(0,1,2,3,4,5,6,7,8)) +
 scale_x_log10(breaks=c(1,4,16,64,256,1024,4096,16384,65536,262144,1048576,4194304), labels=trans_format("log2", math_format(2^.x))) +
-ylab('Average Bandwidth(GB/s)') +
+ylab('Average Throughput (GB/s)') +
 xlab('Message Size (Bytes)') +
 scale_color_manual(values=c( "#ccc210", "#ab6857", "#808585"),
                      breaks=c("A10", "DS4" ,"F8"),
-                     labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +  
+                     labels=c("A10-10GbE","DS4_v2-40GbE IB" ,"F8-50GbE IB")) +  
 theme_bw(base_size=13) +  
  theme (legend.position = c(0.3, 0.7),
          legend.background = element_rect(color = "black", size = 0.3, linetype = "solid"),
@@ -497,12 +444,13 @@ geom_bar(stat="identity", position = "dodge", colour="black",size=0.3, width = 1
          geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.5, position = position_dodge(1)) +
          theme_bw(base_size=12) +
          scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
-         breaks=c("A10", "DS4", "F8"), labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +  
-      theme(legend.position = "none", 
-       #        legend.key = element_rect(colour = "grey"),
-        #       legend.key.height = unit(0.5, "line"),
-         #      legend.key.width = unit(4, "line"),
-          #     legend.spacing = unit(100, "line"),
+         breaks=c("A10", "DS4", "F8"), labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +
+   
+      theme(legend.position = "none",
+              legend.key = element_rect(colour = "black"),
+               legend.key.height = unit(0.5, "line"),
+               legend.key.width = unit(4, "line"),
+               legend.spacing = unit(100, "line"),
                plot.margin = unit(x = c(0.2, 0.05, 0, 0), units = "cm"),
                legend.margin=margin(c(0, 0, -8, 0)),
                axis.text.x = element_text(size =16, color = "black"),
@@ -520,12 +468,13 @@ geom_bar(stat="identity", position = "dodge", colour="black",size=0.3, width = 1
 **** BT
 #+begin_src R :results output graphics :file  R/PLOTS/BT.pdf :exports both :width 1.8 :height 4 :session *R* 
 ggplot(df_apps[df_apps$apps %in% c("BT"), ], aes(x=apps, y=average, fill=instance)) +
-geom_bar(stat="identity", position = "dodge", width = 1) +
+geom_bar(stat="identity", position = "dodge",  colour="black",size=0.3,width = 1) +
          geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.5, position = position_dodge(1)) +
          theme_bw(base_size=12) +
          scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
          breaks=c("A10", "DS4", "F8"), labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +  
-      theme(legend.position = "none", 
+ 
+theme(legend.position = "none", 
        #        legend.key = element_rect(colour = "grey"),
         #       legend.key.height = unit(0.5, "line"),
          #      legend.key.width = unit(4, "line"),
@@ -547,12 +496,13 @@ geom_bar(stat="identity", position = "dodge", width = 1) +
 **** CG
 #+begin_src R :results output graphics :file  R/PLOTS/CG.pdf :exports both :width 1.8 :height 4 :session *R* 
 ggplot(df_apps[df_apps$apps %in% c("CG"), ], aes(x=apps, y=average, fill=instance)) +
-geom_bar(stat="identity", position = "dodge", width = 1) +
+geom_bar(stat="identity", position = "dodge", colour="black",size=0.3, width = 1) +
          geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.5, position = position_dodge(1)) +
          theme_bw(base_size=12) +
          scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
          breaks=c("A10", "DS4", "F8"), labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +  
-      theme(legend.position = "none", 
+ 
+ theme(legend.position = "none", 
        #        legend.key = element_rect(colour = "grey"),
         #       legend.key.height = unit(0.5, "line"),
          #      legend.key.width = unit(4, "line"),
@@ -574,12 +524,13 @@ geom_bar(stat="identity", position = "dodge", width = 1) +
 **** EP
 #+begin_src R :results output graphics :file  R/PLOTS/EP.pdf :exports both :width 1.8 :height 4 :session *R* 
 ggplot(df_apps[df_apps$apps %in% c("EP"), ], aes(x=apps, y=average, fill=instance)) +
-geom_bar(stat="identity", position = "dodge", width = 1) +
+geom_bar(stat="identity", position = "dodge",  colour="black",size=0.3, width = 1) +
          geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.5, position = position_dodge(1)) +
          theme_bw(base_size=12) +
          scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
          breaks=c("A10", "DS4", "F8"), labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +  
-      theme(legend.position = "none", 
+ 
+     theme(legend.position = "none", 
        #        legend.key = element_rect(colour = "grey"),
         #       legend.key.height = unit(0.5, "line"),
          #      legend.key.width = unit(4, "line"),
@@ -601,12 +552,13 @@ geom_bar(stat="identity", position = "dodge", width = 1) +
 **** FT
 #+begin_src R :results output graphics :file  R/PLOTS/FT.pdf :exports both :width 1.8 :height 4 :session *R* 
 ggplot(df_apps[df_apps$apps %in% c("FT"), ], aes(x=apps, y=average, fill=instance)) +
-geom_bar(stat="identity", position = "dodge", width = 1.1) +
+geom_bar(stat="identity", position = "dodge",  colour="black",size=0.3,width = 1.1) +
          geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.6, position = position_dodge(1.1)) +
          theme_bw(base_size=12) +
          scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
          breaks=c("A10", "DS4", "F8"), labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +  
-      theme(legend.position = "none", 
+ 
+     theme(legend.position = "none", 
        #        legend.key = element_rect(colour = "grey"),
         #       legend.key.height = unit(0.5, "line"),
          #      legend.key.width = unit(4, "line"),
@@ -629,12 +581,13 @@ geom_bar(stat="identity", position = "dodge", width = 1.1) +
 **** IS
 #+begin_src R :results output graphics :file  R/PLOTS/IS.pdf :exports both :width 1.8 :height 4 :session *R* 
 ggplot(df_apps[df_apps$apps %in% c("IS"), ], aes(x=apps, y=average, fill=instance)) +
-geom_bar(stat="identity", position = "dodge", width = 1) +
+geom_bar(stat="identity", position = "dodge", colour="black",size=0.3, width = 1) +
          geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.5, position = position_dodge(1)) +
          theme_bw(base_size=12) +
          scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
          breaks=c("A10", "DS4", "F8"), labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +  
-      theme(legend.position = "none", 
+ 
+     theme(legend.position = "none", 
        #        legend.key = element_rect(colour = "grey"),
         #       legend.key.height = unit(0.5, "line"),
          #      legend.key.width = unit(4, "line"),
@@ -656,12 +609,13 @@ geom_bar(stat="identity", position = "dodge", width = 1) +
 **** LU
 #+begin_src R :results output graphics :file  R/PLOTS/LU.pdf :exports both :width 1.8 :height 4 :session *R* 
 ggplot(df_apps[df_apps$apps %in% c("LU"), ], aes(x=apps, y=average, fill=instance)) +
-geom_bar(stat="identity", position = "dodge", width = 1) +
+geom_bar(stat="identity", position = "dodge",colour="black",size=0.3, width = 1) +
          geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.5, position = position_dodge(1)) +
          theme_bw(base_size=12) +
          scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
          breaks=c("A10", "DS4", "F8"), labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +  
-      theme(legend.position = "none", 
+ 
+     theme(legend.position = "none", 
        #        legend.key = element_rect(colour = "grey"),
         #       legend.key.height = unit(0.5, "line"),
          #      legend.key.width = unit(4, "line"),
@@ -683,12 +637,13 @@ geom_bar(stat="identity", position = "dodge", width = 1) +
 **** SP
 #+begin_src R :results output graphics :file  R/PLOTS/SP.pdf :exports both :width 1.8 :height 4 :session *R* 
 ggplot(df_apps[df_apps$apps %in% c("SP"), ], aes(x=apps, y=average, fill=instance)) +
-geom_bar(stat="identity", position = "dodge", width = 1.1) +
+geom_bar(stat="identity", position = "dodge",colour="black",size=0.3, width = 1.1) +
          geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.6, position = position_dodge(1.1)) +
          theme_bw(base_size=12) +
          scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
          breaks=c("A10", "DS4", "F8"), labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +  
-      theme(legend.position = "none", 
+ 
+    theme(legend.position = "none", 
        #        legend.key = element_rect(colour = "grey"),
         #       legend.key.height = unit(0.5, "line"),
          #      legend.key.width = unit(4, "line"),
@@ -710,12 +665,13 @@ geom_bar(stat="identity", position = "dodge", width = 1.1) +
 **** MG
 #+begin_src R :results output graphics :file  R/PLOTS/MG.pdf :exports both :width 1.8 :height 4 :session *R* 
 ggplot(df_apps[df_apps$apps %in% c("MG"), ], aes(x=apps, y=average, fill=instance)) +
-geom_bar(stat="identity", position = "dodge", width = 1) +
+geom_bar(stat="identity", position = "dodge", colour="black",size=0.3, width = 1) +
          geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.5, position = position_dodge(1)) +
          theme_bw(base_size=12) +
          scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
          breaks=c("A10", "DS4", "F8"), labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +  
-      theme(legend.position = "none", 
+ 
+     theme(legend.position = "none", 
        #        legend.key = element_rect(colour = "grey"),
         #       legend.key.height = unit(0.5, "line"),
          #      legend.key.width = unit(4, "line"),
@@ -758,10 +714,10 @@ geom_bar(stat="identity", position = "dodge", width = 1) +
          scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
          breaks=c("A10", "DS4", "F8"), labels=c("A10-10GbE","DS4-40GbE IB" ,"F8-50GbE IB")) +  
       theme(legend.position = "top", 
-       #        legend.key = element_rect(colour = "grey"),
-        #       legend.key.height = unit(0.5, "line"),
-         #      legend.key.width = unit(4, "line"),
-          #     legend.spacing = unit(100, "line"),
+               legend.key = element_rect(colour = "black"),
+               legend.key.height = unit(0.5, "line"),
+               legend.key.width = unit(4, "line"),
+               legend.spacing = unit(100, "line"),
                plot.margin = unit(x = c(0.2, 0.05, 0, 0), units = "cm"),
                legend.margin=margin(c(0, 0, -8, 0)),
                axis.text.x = element_text(size =16, color = "black"),
@@ -844,7 +800,7 @@ cols(
 **** Alya
 #+begin_src R :results output graphics :file  R/PLOTS/ALYA-Cost.pdf :exports both :width 1.8 :height 4 :session *R* 
 ggplot(df_apps[df_apps$apps %in% c("ALYA"), ], aes(x=apps, y=cost, fill=instance)) +
-geom_bar(stat="identity", position = "dodge", width = 1) +
+geom_bar(stat="identity", position = "dodge",colour="black",size=0.3, width = 1) +
          #geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.5, position = position_dodge(1)) +
          theme_bw(base_size=12) +
          scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
@@ -870,7 +826,7 @@ geom_bar(stat="identity", position = "dodge", width = 1) +
 **** BT
 #+begin_src R :results output graphics :file  R/PLOTS/BT-Cost.pdf :exports both :width 1.8 :height 4 :session *R* 
 ggplot(df_apps[df_apps$apps %in% c("BT"), ], aes(x=apps, y=cost, fill=instance)) +
-geom_bar(stat="identity", position = "dodge", width = 1) +
+geom_bar(stat="identity", position = "dodge", colour="black",size=0.3,width = 1) +
          #geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.5, position = position_dodge(1)) +
          theme_bw(base_size=12) +
          scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
@@ -896,7 +852,7 @@ geom_bar(stat="identity", position = "dodge", width = 1) +
 **** CG
 #+begin_src R :results output graphics :file  R/PLOTS/CG-Cost.pdf :exports both :width 1.8 :height 4 :session *R* 
 ggplot(df_apps[df_apps$apps %in% c("CG"), ], aes(x=apps, y=cost, fill=instance)) +
-geom_bar(stat="identity", position = "dodge", width = 1) +
+geom_bar(stat="identity", position = "dodge", colour="black",size=0.3,width = 1) +
          #geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.5, position = position_dodge(1)) +
          theme_bw(base_size=12) +
          scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
@@ -923,7 +879,7 @@ geom_bar(stat="identity", position = "dodge", width = 1) +
 **** EP
 #+begin_src R :results output graphics :file  R/PLOTS/EP-Cost.pdf :exports both :width 1.8 :height 4 :session *R* 
 ggplot(df_apps[df_apps$apps %in% c("EP"), ], aes(x=apps, y=cost, fill=instance)) +
-geom_bar(stat="identity", position = "dodge", width = 1) +
+  geom_bar(stat="identity", position = "dodge",  colour="black",size=0.3,width = 1) +
          #geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.5, position = position_dodge(1)) +
          theme_bw(base_size=12) +
          scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
@@ -950,7 +906,7 @@ geom_bar(stat="identity", position = "dodge", width = 1) +
 **** FT
 #+begin_src R :results output graphics :file  R/PLOTS/FT-Cost.pdf :exports both :width 1.8 :height 4 :session *R* 
 ggplot(df_apps[df_apps$apps %in% c("FT"), ], aes(x=apps, y=cost, fill=instance)) +
-geom_bar(stat="identity", position = "dodge", width = 1) +
+geom_bar(stat="identity", position = "dodge",  colour="black",size=0.3,width = 1) +
          #geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.5, position = position_dodge(1)) +
          theme_bw(base_size=12) +
          scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
@@ -977,7 +933,7 @@ geom_bar(stat="identity", position = "dodge", width = 1) +
 **** IS
 #+begin_src R :results output graphics :file  R/PLOTS/IS-Cost.pdf :exports both :width 1.8 :height 4 :session *R* 
 ggplot(df_apps[df_apps$apps %in% c("IS"), ], aes(x=apps, y=cost, fill=instance)) +
-geom_bar(stat="identity", position = "dodge", width = 1) +
+geom_bar(stat="identity", position = "dodge",  colour="black",size=0.3,width = 1) +
          #geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.5, position = position_dodge(1)) +
          theme_bw(base_size=12) +
          scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
@@ -1004,7 +960,7 @@ geom_bar(stat="identity", position = "dodge", width = 1) +
 **** LU
 #+begin_src R :results output graphics :file  R/PLOTS/LU-Cost.pdf :exports both :width 1.8 :height 4 :session *R* 
 ggplot(df_apps[df_apps$apps %in% c("LU"), ], aes(x=apps, y=cost, fill=instance)) +
-geom_bar(stat="identity", position = "dodge", width = 1) +
+geom_bar(stat="identity", position = "dodge", colour="black",size=0.3, width = 1) +
          #geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.5, position = position_dodge(1)) +
          theme_bw(base_size=12) +
          scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
@@ -1031,7 +987,7 @@ geom_bar(stat="identity", position = "dodge", width = 1) +
 **** MG
 #+begin_src R :results output graphics :file  R/PLOTS/MG-Cost.pdf :exports both :width 1.8 :height 4 :session *R* 
 ggplot(df_apps[df_apps$apps %in% c("MG"), ], aes(x=apps, y=cost, fill=instance)) +
-geom_bar(stat="identity", position = "dodge", width = 1) +
+geom_bar(stat="identity", position = "dodge", colour="black",size=0.3, width = 1) +
          #geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.5, position = position_dodge(1)) +
          theme_bw(base_size=12) +
          scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
@@ -1058,7 +1014,7 @@ geom_bar(stat="identity", position = "dodge", width = 1) +
 **** SP
 #+begin_src R :results output graphics :file  R/PLOTS/SP-Cost.pdf :exports both :width 1.8 :height 4 :session *R* 
 ggplot(df_apps[df_apps$apps %in% c("SP"), ], aes(x=apps, y=cost, fill=instance)) +
-geom_bar(stat="identity", position = "dodge", width = 1) +
+geom_bar(stat="identity", position = "dodge",  colour="black",size=0.3,width = 1) +
          #geom_errorbar(aes(ymin=average-ste, ymax=average+ste), width=0.5, position = position_dodge(1)) +
          theme_bw(base_size=12) +
          scale_fill_manual(values=c( "#ccc210", "#ab6857", "#808585") ,
